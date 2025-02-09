@@ -1,6 +1,12 @@
+import Sidebar from "./components/Sidebar";
+import MainScreen from "./components/MainScreen";
+
 function App() {
   return (
-    <h1 className="text-3xl">AI Chat</h1>
+    <div className="flex h-full">
+      <Sidebar />
+      <MainScreen />
+    </div>
   )
 }
 

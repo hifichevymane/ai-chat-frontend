@@ -1,4 +1,4 @@
-import ThemeCard from "./components/ThemeCard";
+import MessageTemplateCard from "./components/MessageTemplateCard";
 import Input from "./components/Input";
 import SendBtn from "./components/SendBtn";
 
@@ -21,9 +21,9 @@ function App() {
           Discover and conquer new information with AI Bot!
         </h3>
         <div className="flex gap-8 mb-[168px]">
-          <ThemeCard theme="Fun">Tell me a joke to impress the girl I like</ThemeCard>
-          <ThemeCard theme="Work Assistant">Create an online chat website</ThemeCard>
-          <ThemeCard theme="AI Teacher">What was the Newton’s third law?</ThemeCard>
+          <MessageTemplateCard theme="Fun">Tell me a joke to impress the girl I like</MessageTemplateCard>
+          <MessageTemplateCard theme="Work Assistant">Create an online chat website</MessageTemplateCard>
+          <MessageTemplateCard theme="AI Teacher">What was the Newton’s third law?</MessageTemplateCard>
         </div>
         <div className="flex justify-center w-full gap-2.5">
           <Input onInput={onInput} />

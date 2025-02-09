@@ -1,1 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Anuphan:wght@100..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import 'tailwindcss';
+
+@theme {
+  --font-primary: Inter, serif;
+  --font-secondary: Anuphan, serif;
+  --color-primary-000: #ffffff;
+  --color-primary-100: #f5efff;
+  --color-primary-200: #e5d9f2;
+  --color-primary-300: #cdc1ff;
+  --color-primary-400: #a294f9;
+  --color-primary-500: #574d95;
+  --color-primary-600: #7362dd;
+  --color-secondary: rgba(0, 0, 0, 0.6);
+}

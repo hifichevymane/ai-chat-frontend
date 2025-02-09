@@ -8,7 +8,7 @@ function App() {
   const [isSendBtnActive, setIsSendBtnActive] = useState<boolean>(false);
 
   const onInput: React.ChangeEventHandler<HTMLInputElement> = ({ target }) => {
-    setIsSendBtnActive(!!target.value)
+    setIsSendBtnActive(!!target.value.trim())
   };
 
   return (

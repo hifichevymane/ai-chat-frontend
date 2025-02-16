@@ -2,13 +2,31 @@ import MessageTemplateCard from "./MessageTemplateCard";
 import Input from "./Input";
 import SendBtn from "./SendBtn";
 
+import { api } from "../fetch";
 import { useState } from "react";
 
 export default function MainScreen() {
   const [isSendBtnActive, setIsSendBtnActive] = useState<boolean>(false);
+  const [inputText, setInputText] = useState<string>('');
 
   const onInput: React.ChangeEventHandler<HTMLInputElement> = ({ target }) => {
-    setIsSendBtnActive(!!target.value.trim())
+    const trimmedValue = target.value.trim();
+    setInputText(trimmedValue);
+    setIsSendBtnActive(!!trimmedValue);
+  };
+
+  const onClick: React.MouseEventHandler<HTMLElement> = async () => {
+    if (!isSendBtnActive) return;
+
+    try {
+      const { message }: { message: string } = await api('/chat', {
+        method: 'POST',
+        body: { prompt: inputText },
+      });
+      console.log(message);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -26,7 +44,7 @@ export default function MainScreen() {
       </div>
       <div className="flex justify-center w-full gap-2.5">
         <Input onInput={onInput} />
-        <SendBtn isActive={isSendBtnActive} />
+        <SendBtn isActive={isSendBtnActive} onClick={onClick} />
       </div>
     </div>
   )

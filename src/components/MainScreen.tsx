@@ -1,6 +1,8 @@
-import MessageTemplateCard from "./MessageTemplateCard";
 import Input from "./Input";
 import SendBtn from "./SendBtn";
+import StartingChatMessage from "./StartingChatMessage";
+import Message from "../interfaces/Message";
+import MessagesContainer from "./MessagesContainer";
 
 import { api } from "../fetch";
 import { useState } from "react";
@@ -8,6 +10,7 @@ import { useState } from "react";
 export default function MainScreen() {
   const [isSendBtnActive, setIsSendBtnActive] = useState<boolean>(false);
   const [inputText, setInputText] = useState<string>('');
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const onInput: React.ChangeEventHandler<HTMLInputElement> = ({ target }) => {
     const trimmedValue = target.value.trim();
@@ -15,36 +18,42 @@ export default function MainScreen() {
     setIsSendBtnActive(!!trimmedValue);
   };
 
-  const onClick: React.MouseEventHandler<HTMLElement> = async () => {
-    if (!isSendBtnActive) return;
-
-    try {
-      const { message }: { message: string } = await api('/chat', {
-        method: 'POST',
-        body: { prompt: inputText },
-      });
-      console.log(message);
-    } catch (err) {
-      console.error(err);
-    }
+  const onKeyUp: React.KeyboardEventHandler<HTMLElement> = (e) => {
+    if (e.key !== 'Enter') return;
+    addMessage();
   };
 
+  const addMessage = async () => {
+    if (!isSendBtnActive) return;
+
+    setIsSendBtnActive(false);
+    setMessages(prevMessages => [...prevMessages, { text: inputText, isUser: true }]);
+
+    // try {
+    //   const { message }: { message: string } = await api('/chat', {
+    //     method: 'POST',
+    //     body: { prompt: inputText },
+    //   });
+    //   console.log(message);
+    // } catch (err) {
+    //   console.error(err);
+    // }
+  }
+
   return (
-    <div className="flex flex-col justify-center items-center h-full w-fit mx-auto">
-      <h1 className="text-3xl text-center font-semibold font-secondary w-[401px] mb-6">
-        Hi, I’m Mamaliga AI Chat Bot How can I help you?
-      </h1>
-      <h3 className="text-xl text-primary-500 mb-9">
-        Discover and conquer new information with AI Bot!
-      </h3>
-      <div className="flex gap-8 mb-[168px]">
-        <MessageTemplateCard theme="Fun">Tell me a joke to impress the girl I like</MessageTemplateCard>
-        <MessageTemplateCard theme="Work Assistant">Create an online chat website</MessageTemplateCard>
-        <MessageTemplateCard theme="AI Teacher">What was the Newton’s third law?</MessageTemplateCard>
+    <div className="flex flex-col justify-center w-full items-center py-8">
+      <div className="flex flex-col justify-between items-center h-full w-full">
+        <div className="flex flex-col items-center grow w-full">
+          {
+            messages.length
+              ? <MessagesContainer messages={messages} />
+              : <StartingChatMessage />
+          }
+        </div>
       </div>
-      <div className="flex justify-center w-full gap-2.5">
+      <div className="flex justify-center w-[60%] gap-2.5 absolute bottom-8" onKeyUp={onKeyUp}>
         <Input onInput={onInput} />
-        <SendBtn isActive={isSendBtnActive} onClick={onClick} />
+        <SendBtn isActive={isSendBtnActive} onClick={addMessage} />
       </div>
     </div>
   )

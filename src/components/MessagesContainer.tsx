@@ -7,7 +7,7 @@ type Props = {
 
 export default function MessagesContainer({ messages }: Props) {
   return (
-    <div className="w-full h-full py-16 flex flex-col items-end gap-7 px-1/2">
+    <div className="w-full h-full py-16 flex flex-col items-end gap-7 px-[10%]">
       {messages.map(({ text }, idx) => (<ChatMessage key={idx}>{text}</ChatMessage>))}
     </div>
   )

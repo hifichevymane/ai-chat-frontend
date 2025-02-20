@@ -13,11 +13,11 @@ export default function MainScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
-    setIsSendBtnActive(!!inputText);
+    setIsSendBtnActive(!!inputText.trim());
   }, [inputText]);
 
   const onInput: React.ChangeEventHandler<HTMLInputElement> = ({ target }) => {
-    setInputText(target.value.trim());
+    setInputText(target.value);
   };
 
   const onKeyUp: React.KeyboardEventHandler<HTMLElement> = (e) => {
@@ -28,15 +28,18 @@ export default function MainScreen() {
   const addMessage = async () => {
     if (!isSendBtnActive) return;
 
-    setMessages(prevMessages => [...prevMessages, { text: inputText, isUser: true }]);
-    setInputText('');
-
     try {
+      const trimmedInputValue = inputText.trim();
+      setMessages(prevMessages => [...prevMessages, { text: trimmedInputValue, isUser: true }]);
+      setInputText('');
+
       const { message }: { message: string } = await api('/chat', {
         method: 'POST',
-        body: { prompt: inputText },
+        body: { prompt: trimmedInputValue },
       });
+
       console.log(message);
+      setMessages(prevMessages => [...prevMessages, { text: message, isUser: false }]);
     } catch (err) {
       console.error(err);
     }

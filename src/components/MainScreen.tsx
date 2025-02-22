@@ -33,13 +33,20 @@ export default function MainScreen() {
       setMessages(prevMessages => [...prevMessages, { text: trimmedInputValue, isUser: true }]);
       setInputText('');
 
-      const { message }: { message: string } = await api('/chat', {
+      const stream = await api('/chat', {
         method: 'POST',
         body: { prompt: trimmedInputValue },
+        responseType: 'stream'
       });
+      const llmMessage = { text: '', isUser: false };
+      setMessages(prevMessages => [...prevMessages, llmMessage]);
 
-      console.log(message);
-      setMessages(prevMessages => [...prevMessages, { text: message, isUser: false }]);
+      const decoder = new TextDecoder();
+      for await (const chunk of stream) {
+        const decodedText = decoder.decode(chunk);
+        llmMessage.text += decodedText;
+        console.log(decodedText);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -50,7 +57,7 @@ export default function MainScreen() {
       {
         messages.length
           ? (
-            <div className="overflow-scroll mb-24">
+            <div className="h-full overflow-scroll mb-24">
               <MessagesContainer messages={messages} />
             </div>
           )

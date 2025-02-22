@@ -46,19 +46,21 @@ export default function MainScreen() {
   }
 
   return (
-    <div className="flex flex-col justify-center w-full items-center py-8">
-      <div className="flex flex-col justify-between items-center h-full w-full">
-        <div className="flex flex-col items-center grow w-full overflow-scroll">
-          {
-            messages.length
-              ? <MessagesContainer messages={messages} />
-              : <StartingChatMessage />
-          }
+    <div className="flex flex-col justify-center h-full w-full relative">
+      {
+        messages.length
+          ? (
+            <div className="overflow-scroll mb-24">
+              <MessagesContainer messages={messages} />
+            </div>
+          )
+          : <StartingChatMessage />
+      }
+      <div className="flex justify-center w-full mb-4 absolute bottom-0" onKeyUp={onKeyUp}>
+        <div className="flex justify-center w-[85%] gap-2.5 absolute bottom-0">
+          <Input onInput={onInput} value={inputText} />
+          <SendBtn isActive={isSendBtnActive} onClick={addMessage} />
         </div>
-      </div>
-      <div className="flex justify-center w-[60%] gap-2.5 absolute bottom-8" onKeyUp={onKeyUp}>
-        <Input onInput={onInput} value={inputText} />
-        <SendBtn isActive={isSendBtnActive} onClick={addMessage} />
       </div>
     </div>
   )

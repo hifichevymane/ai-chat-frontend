@@ -30,16 +30,25 @@ export default function MainScreen() {
 
     try {
       const trimmedInputValue = inputText.trim();
-      setMessages(prevMessages => [...prevMessages, { text: trimmedInputValue, isUser: true }]);
+      setMessages(prev => [...prev, { text: trimmedInputValue, isUser: true }]);
       setInputText('');
 
-      const { message }: { message: string } = await api('/chat', {
+      const stream = await api('/chat', {
         method: 'POST',
         body: { prompt: trimmedInputValue },
+        responseType: 'stream'
       });
+      const llmMessage: Message = { text: '', isUser: false };
+      // llmMessageRef.current = llmMessage;
+      setMessages(prev => [...prev, llmMessage]);
 
-      console.log(message);
-      setMessages(prevMessages => [...prevMessages, { text: message, isUser: false }]);
+      const decoder = new TextDecoder();
+      // @ts-expect-error Stream does implement the async iterable
+      for await (const chunk of stream) {
+        const decodedChunk = decoder.decode(chunk);
+        llmMessage.text += decodedChunk;
+        setMessages(prev => [...prev]);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -50,7 +59,7 @@ export default function MainScreen() {
       {
         messages.length
           ? (
-            <div className="overflow-scroll mb-24">
+            <div className="h-full overflow-scroll mb-24">
               <MessagesContainer messages={messages} />
             </div>
           )

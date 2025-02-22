@@ -1,50 +1,66 @@
-import MessageTemplateCard from "./MessageTemplateCard";
 import Input from "./Input";
 import SendBtn from "./SendBtn";
+import StartingChatMessage from "./StartingChatMessage";
+import Message from "../interfaces/Message";
+import MessagesContainer from "./MessagesContainer";
 
 import { api } from "../fetch";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function MainScreen() {
   const [isSendBtnActive, setIsSendBtnActive] = useState<boolean>(false);
   const [inputText, setInputText] = useState<string>('');
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    setIsSendBtnActive(!!inputText.trim());
+  }, [inputText]);
 
   const onInput: React.ChangeEventHandler<HTMLInputElement> = ({ target }) => {
-    const trimmedValue = target.value.trim();
-    setInputText(trimmedValue);
-    setIsSendBtnActive(!!trimmedValue);
+    setInputText(target.value);
   };
 
-  const onClick: React.MouseEventHandler<HTMLElement> = async () => {
+  const onKeyUp: React.KeyboardEventHandler<HTMLElement> = (e) => {
+    if (e.key !== 'Enter') return;
+    addMessage();
+  };
+
+  const addMessage = async () => {
     if (!isSendBtnActive) return;
 
     try {
+      const trimmedInputValue = inputText.trim();
+      setMessages(prevMessages => [...prevMessages, { text: trimmedInputValue, isUser: true }]);
+      setInputText('');
+
       const { message }: { message: string } = await api('/chat', {
         method: 'POST',
-        body: { prompt: inputText },
+        body: { prompt: trimmedInputValue },
       });
+
       console.log(message);
+      setMessages(prevMessages => [...prevMessages, { text: message, isUser: false }]);
     } catch (err) {
       console.error(err);
     }
-  };
+  }
 
   return (
-    <div className="flex flex-col justify-center items-center h-full w-fit mx-auto">
-      <h1 className="text-3xl text-center font-semibold font-secondary w-[401px] mb-6">
-        Hi, I’m Mamaliga AI Chat Bot How can I help you?
-      </h1>
-      <h3 className="text-xl text-primary-500 mb-9">
-        Discover and conquer new information with AI Bot!
-      </h3>
-      <div className="flex gap-8 mb-[168px]">
-        <MessageTemplateCard theme="Fun">Tell me a joke to impress the girl I like</MessageTemplateCard>
-        <MessageTemplateCard theme="Work Assistant">Create an online chat website</MessageTemplateCard>
-        <MessageTemplateCard theme="AI Teacher">What was the Newton’s third law?</MessageTemplateCard>
-      </div>
-      <div className="flex justify-center w-full gap-2.5">
-        <Input onInput={onInput} />
-        <SendBtn isActive={isSendBtnActive} onClick={onClick} />
+    <div className="flex flex-col justify-center h-full w-full relative">
+      {
+        messages.length
+          ? (
+            <div className="overflow-scroll mb-24">
+              <MessagesContainer messages={messages} />
+            </div>
+          )
+          : <StartingChatMessage />
+      }
+      <div className="flex justify-center w-full mb-4 absolute bottom-0" onKeyUp={onKeyUp}>
+        <div className="flex justify-center w-[85%] gap-2.5 absolute bottom-0">
+          <Input onInput={onInput} value={inputText} />
+          <SendBtn isActive={isSendBtnActive} onClick={addMessage} />
+        </div>
       </div>
     </div>
   )

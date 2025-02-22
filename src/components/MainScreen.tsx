@@ -5,12 +5,13 @@ import Message from "../interfaces/Message";
 import MessagesContainer from "./MessagesContainer";
 
 import { api } from "../fetch";
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function MainScreen() {
   const [isSendBtnActive, setIsSendBtnActive] = useState<boolean>(false);
   const [inputText, setInputText] = useState<string>('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const llmMessageRef = useRef<Message | null>(null);
 
   useEffect(() => {
     setIsSendBtnActive(!!inputText.trim());
@@ -38,14 +39,15 @@ export default function MainScreen() {
         body: { prompt: trimmedInputValue },
         responseType: 'stream'
       });
-      const llmMessage = { text: '', isUser: false };
-      setMessages(prevMessages => [...prevMessages, llmMessage]);
+      const llmMessage: Message = { text: '', isUser: false };
+      llmMessageRef.current = llmMessage;
+      setMessages(prev => [...prev, llmMessage]);
 
       const decoder = new TextDecoder();
       for await (const chunk of stream) {
-        const decodedText = decoder.decode(chunk);
-        llmMessage.text += decodedText;
-        console.log(decodedText);
+        const decodedChunk = decoder.decode(chunk);
+        llmMessageRef.current.text += decodedChunk;
+        setMessages(prev => [...prev]);
       }
     } catch (err) {
       console.error(err);

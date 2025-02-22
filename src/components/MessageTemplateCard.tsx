@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react"
 
-type Props = {
+interface Props {
   theme: string;
 }
 

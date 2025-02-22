@@ -1,4 +1,4 @@
-type Props = {
+interface Props {
   isActive?: boolean,
   onClick?: React.MouseEventHandler<HTMLButtonElement>
 }

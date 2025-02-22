@@ -5,13 +5,12 @@ import Message from "../interfaces/Message";
 import MessagesContainer from "./MessagesContainer";
 
 import { api } from "../fetch";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 export default function MainScreen() {
   const [isSendBtnActive, setIsSendBtnActive] = useState<boolean>(false);
   const [inputText, setInputText] = useState<string>('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const llmMessageRef = useRef<Message | null>(null);
 
   useEffect(() => {
     setIsSendBtnActive(!!inputText.trim());
@@ -31,7 +30,7 @@ export default function MainScreen() {
 
     try {
       const trimmedInputValue = inputText.trim();
-      setMessages(prevMessages => [...prevMessages, { text: trimmedInputValue, isUser: true }]);
+      setMessages(prev => [...prev, { text: trimmedInputValue, isUser: true }]);
       setInputText('');
 
       const stream = await api('/chat', {
@@ -40,13 +39,14 @@ export default function MainScreen() {
         responseType: 'stream'
       });
       const llmMessage: Message = { text: '', isUser: false };
-      llmMessageRef.current = llmMessage;
+      // llmMessageRef.current = llmMessage;
       setMessages(prev => [...prev, llmMessage]);
 
       const decoder = new TextDecoder();
+      // @ts-expect-error Stream does implement the async iterable
       for await (const chunk of stream) {
         const decodedChunk = decoder.decode(chunk);
-        llmMessageRef.current.text += decodedChunk;
+        llmMessage.text += decodedChunk;
         setMessages(prev => [...prev]);
       }
     } catch (err) {

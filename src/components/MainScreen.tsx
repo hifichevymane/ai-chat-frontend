@@ -47,6 +47,7 @@ export default function MainScreen() {
       for await (const chunk of stream) {
         const decodedChunk = decoder.decode(chunk);
         llmMessage.text += decodedChunk;
+        console.log(llmMessage);
         setMessages(prev => [...prev]);
       }
     } catch (err) {

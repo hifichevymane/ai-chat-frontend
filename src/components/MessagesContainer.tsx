@@ -11,7 +11,7 @@ export default function MessagesContainer({ messages }: Props) {
       {messages.map(({ text, isUser }, idx) => {
         return (
           <div key={idx} className={`w-full flex ${isUser ? 'justify-end' : 'justify-normal'}`}>
-            <ChatMessage isUser={isUser}>{text}</ChatMessage>
+            <ChatMessage isUser={isUser} text={text} />
           </div>
         )
       })}

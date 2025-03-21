@@ -1,5 +1,5 @@
 import { useParams } from "react-router";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { GlobalContext } from "../context";
 import MessagesContainer from "../components/MessagesContainer";
 import Input from "../components/Input";
@@ -14,45 +14,58 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState<string>(context.inputValue);
   const [isSendBtnActive, setIsSendBtnActive] = useState<boolean>(false);
+  const renderAfterCalled = useRef(false);
+
+  const getChat = async () => {
+    try {
+      const { context }: { context: Message[] } = await api(`/chats/${id}`);
+      setMessages(context);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  const addPrompt = async () => {
+    try {
+      const trimmedInputValue = inputText.trim();
+      setMessages(prev => [...prev, { content: trimmedInputValue, role: 'user' }]);
+      // console.log('added message:',{ content: trimmedInputValue, role: 'user' });
+      context.inputValue = '';
+      setInputText('');
+
+      const stream = await api(`/chats/${id}/prompt`, {
+        method: 'PATCH',
+        body: { prompt: trimmedInputValue },
+        responseType: 'stream'
+      });
+      const llmMessage: Message = { content: '', role: 'assistant' };
+      setMessages(prev => [...prev, llmMessage]);
+
+      const decoder = new TextDecoder();
+      // @ts-expect-error Stream does implement the async iterable
+      for await (const chunk of stream) {
+        const decodedChunk = decoder.decode(chunk);
+        llmMessage.content += decodedChunk;
+        setMessages(prev => [...prev]);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  useEffect(() => {
+    if (!renderAfterCalled.current && !context.newChatCreated) {
+      getChat();
+    } else if (context.newChatCreated) {
+      addPrompt();
+      context.newChatCreated = false;
+    }
+    renderAfterCalled.current = true;
+  }, []);
 
   useEffect(() => {
     setIsSendBtnActive(!!inputText.trim());
   }, [inputText]);
-
-  useEffect(() => {
-    const { newChatCreated } = context;
-    if (!newChatCreated) return;
-
-    setMessages(prev => [...prev, { text: inputText, isUser: true }]);
-    context.inputValue = '';
-    setInputText('');
-    context.newChatCreated = false;
-
-    const fetchChat = async () => {
-      try {
-        const stream = await api(`/chat/${id}/prompt`, {
-          method: 'PATCH',
-          body: { prompt: inputText },
-          responseType: 'stream'
-        });
-
-        const llmMessage: Message = { text: '', isUser: false };
-        setMessages(prev => [...prev, llmMessage]);
-
-        const decoder = new TextDecoder();
-        // @ts-expect-error Stream does implement the async iterable
-        for await (const chunk of stream) {
-          const decodedChunk = decoder.decode(chunk);
-          llmMessage.text += decodedChunk;
-          setMessages(prev => [...prev]);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchChat();
-  }, []);
 
   const onInput: React.ChangeEventHandler<HTMLInputElement> = ({ target }) => {
     setInputText(target.value);
@@ -63,32 +76,9 @@ export default function ChatPage() {
     addMessage();
   };
 
-  const addMessage = async () => {
+  const addMessage = () => {
     if (!isSendBtnActive) return;
-
-    try {
-      const trimmedInputValue = inputText.trim();
-      setMessages(prev => [...prev, { text: trimmedInputValue, isUser: true }]);
-      setInputText('');
-
-      const stream = await api(`/chat/${id}/prompt`, {
-        method: 'PATCH',
-        body: { prompt: trimmedInputValue },
-        responseType: 'stream'
-      });
-      const llmMessage: Message = { text: '', isUser: false };
-      setMessages(prev => [...prev, llmMessage]);
-
-      const decoder = new TextDecoder();
-      // @ts-expect-error Stream does implement the async iterable
-      for await (const chunk of stream) {
-        const decodedChunk = decoder.decode(chunk);
-        llmMessage.text += decodedChunk;
-        setMessages(prev => [...prev]);
-      }
-    } catch (err) {
-      console.error(err);
-    }
+    addPrompt();
   };
 
   return (

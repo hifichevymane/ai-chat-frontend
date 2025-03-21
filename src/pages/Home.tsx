@@ -35,7 +35,7 @@ export default function HomePage() {
     try {
       const trimmedInputValue = inputText.trim();
       context.inputValue = trimmedInputValue;
-      const { id } = await api('/chat', { method: 'POST' });
+      const { id } = await api('/chats', { method: 'POST' });
       context.newChatCreated = true;
       navigate(`/${id}`);
     } catch (err) {

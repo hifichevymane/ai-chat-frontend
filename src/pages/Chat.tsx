@@ -54,6 +54,10 @@ export default function ChatPage() {
   }
 
   useEffect(() => {
+    getChat();
+  }, [id]);
+
+  useEffect(() => {
     if (!renderAfterCalled.current && !context.newChatCreated) {
       getChat();
     } else if (context.newChatCreated) {

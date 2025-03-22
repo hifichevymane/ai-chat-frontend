@@ -37,12 +37,14 @@ export default function ChatList() {
       {
         !chats.length
           ? (
-            <h4 className="text-center font-secondary font-semibold text-xl text-black/45">
-              No Saved Chats
-            </h4>
+            <div className="h-full flex justify-center items-center">
+              <h4 className="flex text-center font-secondary font-semibold text-xl text-black/45">
+                No Saved Chats
+              </h4>
+            </div>
           )
           : (
-            <div className="flex flex-col gap-5 my-11 overflow-scroll">
+            <div className="flex flex-col gap-5 my-11 overflow-scroll h-full">
               {chats.map(({ id, title }) => (
                 <ChatTab key={id} id={id} title={title} active={params.id === id} onClick={onChatClick} />
               ))}

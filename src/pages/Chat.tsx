@@ -1,5 +1,5 @@
 import { useParams } from "react-router";
-import { useContext, useEffect, useState, useRef } from "react";
+import { useContext, useEffect, useState } from "react";
 import { GlobalContext } from "../context";
 import MessagesContainer from "../components/MessagesContainer";
 import Input from "../components/Input";
@@ -14,7 +14,6 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState<string>(context.inputValue);
   const [isSendBtnActive, setIsSendBtnActive] = useState<boolean>(false);
-  const renderAfterCalled = useRef(false);
 
   const getChat = async () => {
     try {
@@ -29,7 +28,6 @@ export default function ChatPage() {
     try {
       const trimmedInputValue = inputText.trim();
       setMessages(prev => [...prev, { content: trimmedInputValue, role: 'user' }]);
-      // console.log('added message:',{ content: trimmedInputValue, role: 'user' });
       context.inputValue = '';
       setInputText('');
 
@@ -54,18 +52,13 @@ export default function ChatPage() {
   }
 
   useEffect(() => {
-    getChat();
-  }, [id]);
-
-  useEffect(() => {
-    if (!renderAfterCalled.current && !context.newChatCreated) {
+    if (!context.newChatCreated) {
       getChat();
     } else if (context.newChatCreated) {
       addPrompt();
       context.newChatCreated = false;
     }
-    renderAfterCalled.current = true;
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     setIsSendBtnActive(!!inputText.trim());

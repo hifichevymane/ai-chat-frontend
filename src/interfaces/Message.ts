@@ -1,4 +1,4 @@
 export default interface Message {
-  text: string;
-  isUser: boolean;
+  content: string;
+  role: 'user' | 'assistant' | 'system';
 }

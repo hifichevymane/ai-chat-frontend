@@ -1,50 +1,61 @@
-# React + TypeScript + Vite
+# AI Chat Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, minimal frontend for an AI chat application, built with React, TypeScript, and Vite. This project provides a fast, developer-friendly environment with hot module replacement, code linting, and Tailwind CSS for styling.
 
-Currently, two official plugins are available:
+## 🚀 Technologies Used
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- [React](https://react.dev/) — UI library for building user interfaces
+- [TypeScript](https://www.typescriptlang.org/) — Typed superset of JavaScript
+- [Vite](https://vitejs.dev/) — Next-generation frontend tooling
+- [React Router](https://reactrouter.com/) — Declarative routing for React
+- [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS framework
+- [ofetch](https://github.com/unjs/ofetch) — Lightweight fetch wrapper
+- [React Markdown](https://github.com/remarkjs/react-markdown) — Render Markdown in React
+- [remark-gfm](https://github.com/remarkjs/remark-gfm) — GitHub Flavored Markdown support
+- [ESLint](https://eslint.org/) — Linting utility for JavaScript and TypeScript
 
-## Expanding the ESLint configuration
+## 🛠️ Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18 or newer recommended)
+- [pnpm](https://pnpm.io/) (used as the package manager)
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 1. Clone the repository
+```bash
+git clone <your-repo-url>
+cd ai-chat-frontend
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+### 2. Install dependencies
+```bash
+pnpm install
 ```
+
+### 3. Configure environment variables
+Create a `.env` file in the root directory and set the backend API URL:
+
+```env
+VITE_BACKEND_API_URL=https://your-backend-url.com
+```
+
+### 4. Run the development server
+```bash
+pnpm dev
+```
+The app will be available at [http://localhost:5173](http://localhost:5173) (or the port shown in your terminal).
+
+### 5. Build for production
+```bash
+pnpm build
+```
+
+### 6. Preview the production build
+```bash
+pnpm preview
+```
+
+## 📋 Scripts
+- `pnpm dev` — Start the development server
+- `pnpm build` — Build the app for production
+- `pnpm preview` — Preview the production build
+- `pnpm lint` — Run ESLint on the codebase

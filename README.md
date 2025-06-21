@@ -17,7 +17,7 @@ A modern, minimal frontend for an AI chat application, built with React, TypeScr
 ## 🛠️ Getting Started
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v18 or newer recommended)
+- [Node.js](https://nodejs.org/) (v22.x recommended)
 - [pnpm](https://pnpm.io/) (used as the package manager)
 
 ### 1. Clone the repository

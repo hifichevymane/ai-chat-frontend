@@ -17,8 +17,19 @@ export default function ChatPage() {
 
   const getChat = async () => {
     try {
-      const { context }: { context: Message[] } = await api(`/chats/${id}`);
-      setMessages(context);
+      const { chatMessages }: { chatMessages: Message[] } = await api(`/chats/${id}`);
+      setMessages(chatMessages);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  const addUserMessage = async (message: string): Promise<void> => {
+    try {
+      setMessages(prev => [...prev, { content: message, role: 'user' }]);
+      context.inputValue = '';
+      setInputText('');
+      await api(`/chats/${id}/user-message`, { method: 'POST', body: { message } });
     } catch (err) {
       console.error(err);
     }
@@ -27,13 +38,10 @@ export default function ChatPage() {
   const addPrompt = async () => {
     try {
       const trimmedInputValue = inputText.trim();
-      setMessages(prev => [...prev, { content: trimmedInputValue, role: 'user' }]);
-      context.inputValue = '';
-      setInputText('');
+      await addUserMessage(trimmedInputValue);
 
-      const stream = await api(`/chats/${id}/prompt`, {
-        method: 'PATCH',
-        body: { prompt: trimmedInputValue },
+      const stream = await api(`/chats/${id}/generate-llm-response`, {
+        method: 'POST',
         responseType: 'stream'
       });
       const llmMessage: Message = { content: '', role: 'assistant' };

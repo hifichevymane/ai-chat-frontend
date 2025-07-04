@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, Link } from "@tanstack/react-router";
 import { api } from "../fetch";
 import { AUTH_TOKEN_KEY } from "../const";
 
@@ -149,6 +149,15 @@ export default function SignUpPage() {
         >
           {isSubmitting ? "Signing up..." : "Sign Up"}
         </button>
+        <div className="text-center mt-2">
+          <span className="text-primary-500 font-secondary text-sm">Already have an account? </span>
+          <Link
+            to="/login"
+            className="text-primary-600 hover:underline font-secondary text-sm font-semibold transition-colors"
+          >
+            Log in
+          </Link>
+        </div>
       </form>
     </main>
   );

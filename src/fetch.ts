@@ -6,9 +6,8 @@ export const api = ofetch.create({
 
   onRequest({ options }) {
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    if (token) {
-      options.headers.set("Authorization", `Bearer ${token}`);
-    }
+    if (!token) return;
+    options.headers.set("Authorization", `Bearer ${token}`);
   },
 
   onRequestError({ request, options, error }) {
@@ -24,9 +23,7 @@ export const api = ofetch.create({
       response.body
     );
 
-    if (response.status === 401) {
-      localStorage.removeItem(AUTH_TOKEN_KEY);
-      location.href = "/login";
-    }
+    if (response.status !== 401) return;
+    localStorage.removeItem(AUTH_TOKEN_KEY);
   },
 });

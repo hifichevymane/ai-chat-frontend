@@ -1,18 +1,28 @@
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router'
-import { GlobalContext } from './context'
+import { StrictMode } from 'react'
+import { RouterProvider, createRouter } from '@tanstack/react-router'
 import './index.css'
 
-import HomePage from './pages/Home'
-import ChatPage from './pages/Chat'
+// Import the generated route tree
+import { routeTree } from './routeTree.gen'
 
-createRoot(document.getElementById('root')!).render(
-  <GlobalContext.Provider value={{ inputValue: '', newChatCreated: false }}>
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<HomePage />} />
-        <Route path=':id' element={<ChatPage />} />
-      </Routes>
-    </BrowserRouter>
-  </GlobalContext.Provider>
-)
+// Create a new router instance
+const router = createRouter({ routeTree })
+
+// Register the router instance for type safety
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router
+  }
+}
+
+// Render the app
+const rootElement = document.getElementById('root')!
+if (!rootElement.innerHTML) {
+  const root = createRoot(rootElement)
+  root.render(
+    <StrictMode>
+      <RouterProvider router={router} />
+    </StrictMode>,
+  )
+}

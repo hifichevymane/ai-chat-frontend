@@ -4,7 +4,7 @@ import Input from "../components/Input";
 import SendBtn from "../components/SendBtn";
 
 import { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 import { GlobalContext } from "../context";
 
@@ -37,7 +37,7 @@ export default function HomePage() {
       context.inputValue = trimmedInputValue;
       const { id } = await api('/chats', { method: 'POST' });
       context.newChatCreated = true;
-      navigate(`/${id}`);
+      navigate({ to: '/$chatId', params: { chatId: id } });
     } catch (err) {
       console.error(err);
     }

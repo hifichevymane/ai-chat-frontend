@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate } from "@tanstack/react-router";
 import { api } from "../fetch";
 
 import ChatTab from "./ChatTab";
@@ -10,7 +10,7 @@ interface Chat {
 }
 
 export default function ChatList() {
-  const params = useParams();
+  const { chatId } = useParams({ from: '/$chatId' });
   const navigate = useNavigate();
   const [chats, setChats] = useState<Chat[]>([]);
 
@@ -27,8 +27,8 @@ export default function ChatList() {
     fetchChats();
   }, []);
 
-  const onChatClick = (id: string) => navigate(`/${id}`);
-  const onCreateNewChatBtnClick = () => navigate('/');
+  const onChatClick = (id: string) => navigate({ to: '/$chatId', params: { chatId: id } });
+  const onCreateNewChatBtnClick = () => navigate({ to: '/' });
 
   return (
     <>
@@ -54,7 +54,7 @@ export default function ChatList() {
           : (
             <div className="flex flex-col gap-5 my-11 overflow-scroll h-full">
               {chats.map(({ id, title }) => (
-                <ChatTab key={id} id={id} title={title} active={params.id === id} onClick={onChatClick} />
+                <ChatTab key={id} id={id} title={title} active={chatId === id} onClick={onChatClick} />
               ))}
             </div>
           )

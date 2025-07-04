@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { useParams } from "@tanstack/react-router";
 import { useContext, useEffect, useState } from "react";
 import { GlobalContext } from "../context";
 import MessagesContainer from "../components/MessagesContainer";
@@ -9,7 +9,7 @@ import Sidebar from "../components/Sidebar";
 import { api } from "../fetch";
 
 export default function ChatPage() {
-  const { id } = useParams();
+  const { chatId } = useParams({ from: '/$chatId' });
   const context = useContext(GlobalContext);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState<string>(context.inputValue);
@@ -17,7 +17,7 @@ export default function ChatPage() {
 
   const getChat = async () => {
     try {
-      const { chatMessages }: { chatMessages: Message[] } = await api(`/chats/${id}`);
+      const { chatMessages }: { chatMessages: Message[] } = await api(`/chats/${chatId}`);
       setMessages(chatMessages);
     } catch (err) {
       console.error(err);
@@ -29,7 +29,7 @@ export default function ChatPage() {
       setMessages(prev => [...prev, { content: message, role: 'user' }]);
       context.inputValue = '';
       setInputText('');
-      await api(`/chats/${id}/user-message`, { method: 'POST', body: { message } });
+      await api(`/chats/${chatId}/user-message`, { method: 'POST', body: { message } });
     } catch (err) {
       console.error(err);
     }
@@ -40,7 +40,7 @@ export default function ChatPage() {
       const trimmedInputValue = inputText.trim();
       await addUserMessage(trimmedInputValue);
 
-      const stream = await api(`/chats/${id}/generate-llm-response`, {
+      const stream = await api(`/chats/${chatId}/generate-llm-response`, {
         method: 'POST',
         responseType: 'stream'
       });
@@ -66,7 +66,7 @@ export default function ChatPage() {
       addPrompt();
       context.newChatCreated = false;
     }
-  }, [id]);
+  }, [chatId]);
 
   useEffect(() => {
     setIsSendBtnActive(!!inputText.trim());

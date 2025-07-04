@@ -1,7 +1,15 @@
 import { ofetch } from 'ofetch';
+import { AUTH_TOKEN_KEY } from './const';
 
 export const api = ofetch.create({
   baseURL: `${import.meta.env.VITE_BACKEND_API_URL}/api/v1`,
+
+  onRequest({ options }) {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (token) {
+      options.headers.set("Authorization", `Bearer ${token}`);
+    }
+  },
 
   onRequestError({ request, options, error }) {
     console.error("[fetch request error]", request, options, error);

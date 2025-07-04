@@ -9,3 +9,8 @@ export const redirectToLoginIfNotAuthenticated = () => {
   if (isAuthenticated()) return;
   throw redirect({ to: "/login" });
 };
+
+export const redirectToHomeIfAuthenticated = () => {
+  if (!isAuthenticated()) return;
+  throw redirect({ to: "/" });
+};

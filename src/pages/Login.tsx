@@ -1,7 +1,9 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "@tanstack/react-router";
 import { api } from "../fetch";
+import { AUTH_TOKEN_KEY } from "../const";
 
 const loginValidationSchema = z.object({
   email: z.string()
@@ -16,10 +18,11 @@ const loginValidationSchema = z.object({
 type LoginFormValues = z.infer<typeof loginValidationSchema>;
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isValid },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginValidationSchema),
     mode: "onChange",
@@ -27,11 +30,12 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      const response = await api("/auth/login", {
+      const { token } = await api("/auth/login", {
         method: "POST",
         body: data,
       });
-      console.log(response);
+      localStorage.setItem(AUTH_TOKEN_KEY, token);
+      navigate({ to: "/" });
     } catch (error) {
       console.error(error);
     }
@@ -85,7 +89,7 @@ export default function LoginPage() {
         </div>
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !isValid}
           className={`mt-2 w-full h-12 rounded-lg font-primary text-base font-semibold transition-colors duration-150 bg-primary-600 text-primary-000 hover:bg-primary-500 disabled:bg-primary-300 disabled:text-primary-400 disabled:cursor-not-allowed`}
         >
           {isSubmitting ? "Logging in..." : "Log in"}

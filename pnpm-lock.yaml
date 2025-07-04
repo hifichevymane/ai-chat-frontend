@@ -72,6 +72,9 @@ importers:
       globals:
         specifier: ^15.15.0
         version: 15.15.0
+      prettier:
+        specifier: 3.6.2
+        version: 3.6.2
       typescript:
         specifier: ~5.7.3
         version: 5.7.3

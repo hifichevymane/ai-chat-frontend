@@ -1,5 +1,5 @@
-import Markdown from "react-markdown"
-import remarkGfm from "remark-gfm"
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import Message from "../interfaces/Message";
 
 export default function ChatMessage({ role, content }: Message) {
@@ -15,5 +15,5 @@ export default function ChatMessage({ role, content }: Message) {
     <div className='flex flex-col gap-4 w-fit max-w-4/5 p-4 bg-primary-100 rounded-t-xl rounded-bl-xl'>
       {content}
     </div>
-  )
+  );
 }

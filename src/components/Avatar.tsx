@@ -14,5 +14,5 @@ export default function Avatar({ onClick }: Props) {
         </g>
       </svg>
     </div>
-  )
+  );
 }

@@ -22,7 +22,7 @@ export default function ChatPage() {
     } catch (err) {
       console.error(err);
     }
-  }
+  };
 
   const addUserMessage = async (message: string): Promise<void> => {
     try {
@@ -33,7 +33,7 @@ export default function ChatPage() {
     } catch (err) {
       console.error(err);
     }
-  }
+  };
 
   const addPrompt = async () => {
     try {
@@ -57,7 +57,7 @@ export default function ChatPage() {
     } catch (err) {
       console.error(err);
     }
-  }
+  };
 
   useEffect(() => {
     if (!context.newChatCreated) {

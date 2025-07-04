@@ -17,5 +17,5 @@ export default function ChatTab({ id, title, active, onClick }: Props) {
       </svg>
       <span className={active ? 'font-bold' : ''}>{title}</span>
     </button>
-  )
+  );
 }

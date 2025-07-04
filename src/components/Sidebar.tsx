@@ -1,5 +1,5 @@
-import AccountSection from "./AccountSection"
-import ChatList from "./ChatList"
+import AccountSection from "./AccountSection";
+import ChatList from "./ChatList";
 
 export default function Sidebar() {
   return (
@@ -7,5 +7,5 @@ export default function Sidebar() {
       <ChatList />
       <AccountSection />
     </aside>
-  )
+  );
 }

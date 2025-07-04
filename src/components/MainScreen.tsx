@@ -51,7 +51,7 @@ export default function MainScreen() {
     } catch (err) {
       console.error(err);
     }
-  }
+  };
 
   return (
     <div className="flex flex-col justify-center h-full w-full relative">
@@ -71,5 +71,5 @@ export default function MainScreen() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-import Avatar from "./Avatar"
-import { AUTH_TOKEN_KEY } from "../const"
-import { useNavigate } from "@tanstack/react-router"
+import Avatar from "./Avatar";
+import { AUTH_TOKEN_KEY } from "../const";
+import { useNavigate } from "@tanstack/react-router";
 
 export default function AccountSection() {
   const navigate = useNavigate();
@@ -18,5 +18,5 @@ export default function AccountSection() {
         <span className="font-medium">email@email.com</span>
       </div>
     </div>
-  )
+  );
 }

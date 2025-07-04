@@ -63,5 +63,5 @@ export default function ChatList({ activeChatId }: Props) {
           )
       }
     </>
-  )
+  );
 }

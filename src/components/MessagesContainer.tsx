@@ -1,5 +1,5 @@
-import Message from "../interfaces/Message"
-import ChatMessage from "./ChatMessage"
+import Message from "../interfaces/Message";
+import ChatMessage from "./ChatMessage";
 
 interface Props {
   messages: Message[];
@@ -13,8 +13,8 @@ export default function MessagesContainer({ messages }: Props) {
           <div key={idx} className={`w-full flex ${role === 'user' ? 'justify-end' : 'justify-normal'}`}>
             <ChatMessage role={role} content={content} />
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 };

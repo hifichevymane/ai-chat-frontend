@@ -1,4 +1,4 @@
-import Sidebar from "../components/Sidebar"
+import Sidebar from "../components/Sidebar";
 import StartingChatMessage from "../components/StartingChatMessage";
 import Input from "../components/Input";
 import SendBtn from "../components/SendBtn";
@@ -41,7 +41,7 @@ export default function HomePage() {
     } catch (err) {
       console.error(err);
     }
-  }
+  };
 
   return (
     <div className="flex h-full">
@@ -56,5 +56,5 @@ export default function HomePage() {
         </div>
       </div>
     </div>
-  )
+  );
 };

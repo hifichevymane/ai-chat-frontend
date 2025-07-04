@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from "react"
+import type { PropsWithChildren } from "react";
 
 interface Props {
   theme: string;
@@ -19,5 +19,5 @@ export default function ThemeCard({ theme, children }: PropsWithChildren<Props>)
       <h4 className="font-semibold text-primary-500">{theme}</h4>
       <p className="text-center w-[152px] text-secondary">{children}</p>
     </div>
-  )
+  );
 }

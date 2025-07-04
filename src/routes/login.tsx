@@ -5,4 +5,4 @@ import { redirectToHomeIfAuthenticated } from "../utils/auth";
 export const Route = createFileRoute('/login')({
   component: LoginPage,
   beforeLoad: redirectToHomeIfAuthenticated,
-})
+});

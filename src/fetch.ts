@@ -25,5 +25,6 @@ export const api = ofetch.create({
 
     if (response.status !== 401) return;
     localStorage.removeItem(AUTH_TOKEN_KEY);
+    location.href = "/login";
   },
 });

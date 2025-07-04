@@ -46,7 +46,7 @@ export default function LoginPage() {
         noValidate
       >
         <header className="mb-2">
-          <h1 className="text-2xl font-bold font-secondary text-primary-600 mb-1">Sign in</h1>
+          <h1 className="text-2xl font-bold font-secondary text-primary-600 mb-1">Log in</h1>
           <p className="text-primary-500 font-secondary text-base">to continue to AI Chat</p>
         </header>
         <div className="flex flex-col gap-4">
@@ -88,7 +88,7 @@ export default function LoginPage() {
           disabled={isSubmitting}
           className={`mt-2 w-full h-12 rounded-lg font-primary text-base font-semibold transition-colors duration-150 bg-primary-600 text-primary-000 hover:bg-primary-500 disabled:bg-primary-300 disabled:text-primary-400 disabled:cursor-not-allowed`}
         >
-          {isSubmitting ? "Signing in..." : "Sign in"}
+          {isSubmitting ? "Logging in..." : "Log in"}
         </button>
       </form>
     </main>

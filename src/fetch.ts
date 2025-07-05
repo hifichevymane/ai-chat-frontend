@@ -7,16 +7,16 @@ export const api = ofetch.create({
   onRequest({ options }) {
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     if (!token) return;
-    options.headers.set("Authorization", `Bearer ${token}`);
+    options.headers.set('Authorization', `Bearer ${token}`);
   },
 
   onRequestError({ request, options, error }) {
-    console.error("[fetch request error]", request, options, error);
+    console.error('[fetch request error]', request, options, error);
   },
 
   onResponseError({ request, options, response }) {
     console.error(
-      "[fetch response error]",
+      '[fetch response error]',
       request,
       options,
       response.status,
@@ -25,6 +25,6 @@ export const api = ofetch.create({
 
     if (response.status !== 401) return;
     localStorage.removeItem(AUTH_TOKEN_KEY);
-    location.href = "/login";
+    location.href = '/login';
   },
 });

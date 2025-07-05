@@ -1,13 +1,17 @@
 import Avatar from "./Avatar";
 import { AUTH_TOKEN_KEY } from "../const";
 import { useNavigate } from "@tanstack/react-router";
+import { api } from "../fetch";
 
 export default function AccountSection() {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await api('/auth/logout', {
+      method: 'POST'
+    });
     localStorage.removeItem(AUTH_TOKEN_KEY);
-    navigate({ to: "/login" });
+    navigate({ to: '/login' });
   };
 
   return (

@@ -1,4 +1,6 @@
-export default interface Message {
+interface Message {
   content: string;
   role: 'user' | 'assistant' | 'system';
-};
+}
+
+export default Message;

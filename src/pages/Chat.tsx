@@ -20,15 +20,6 @@ export default function ChatPage() {
   const [isSendBtnActive, setIsSendBtnActive] = useState<boolean>(false);
   const isNewChatCreated = useSelector((state: RootState) => state.chat.isNewChatCreated);
 
-  const getChat = async () => {
-    try {
-      const { chatMessages }: { chatMessages: Message[] } = await api(`/chats/${chatId}`);
-      setMessages(chatMessages);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const addUserMessage = async (message: string): Promise<void> => {
     try {
       setMessages(prev => [...prev, { content: message, role: 'user' }]);
@@ -61,6 +52,15 @@ export default function ChatPage() {
   };
 
   useEffect(() => {
+    const getChat = async () => {
+      try {
+        const { chatMessages }: { chatMessages: Message[] } = await api(`/chats/${chatId}`);
+        setMessages(chatMessages);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
     const retrieveChatInfo = async () => {
       if (!isNewChatCreated) {
         getChat();

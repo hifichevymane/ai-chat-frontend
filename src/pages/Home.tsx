@@ -3,18 +3,18 @@ import StartingChatMessage from "../components/StartingChatMessage";
 import Input from "../components/Input";
 import SendBtn from "../components/SendBtn";
 
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
-
-import { GlobalContext } from "../context";
+import { useDispatch } from "react-redux";
 
 import { api } from "../fetch";
+import { setIsNewChatCreated } from "../store/chat/chat-slice";
 
 export default function HomePage() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [isSendBtnActive, setIsSendBtnActive] = useState<boolean>(false);
   const [inputText, setInputText] = useState<string>('');
-  const context = useContext(GlobalContext);
-  const navigate = useNavigate();
 
   useEffect(() => {
     setIsSendBtnActive(!!inputText.trim());
@@ -33,10 +33,15 @@ export default function HomePage() {
     if (!isSendBtnActive) return;
 
     try {
-      const trimmedInputValue = inputText.trim();
-      context.inputValue = trimmedInputValue;
+      const message = inputText.trim();
       const { id } = await api('/chats', { method: 'POST' });
-      context.newChatCreated = true;
+
+      await api(`/chats/${id}/user-message`, {
+        method: 'POST',
+        body: { message }
+      });
+
+      dispatch(setIsNewChatCreated(true));
       navigate({ to: '/$chatId', params: { chatId: id } });
     } catch (err) {
       console.error(err);

@@ -1,38 +1,14 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { api } from "../fetch";
-
 import ChatTab from "./ChatTab";
-
-interface Chat {
-  id: string;
-  title: string;
-}
+import { ChatListItem } from "../interfaces/ChatListItem";
 
 interface Props {
-  activeChatId: string;
+  chats: ChatListItem[];
+  activeChatId?: string;
+  onChatClick: (id: string) => void;
+  onCreateNewChatBtnClick: () => void;
 }
 
-export default function ChatList({ activeChatId }: Props) {
-  const navigate = useNavigate();
-  const [chats, setChats] = useState<Chat[]>([]);
-
-  useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        const chats: Chat[] = await api('/chats');
-        setChats(chats);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchChats();
-  }, []);
-
-  const onChatClick = (id: string) => navigate({ to: '/$chatId', params: { chatId: id } });
-  const onCreateNewChatBtnClick = () => navigate({ to: '/' });
-
+export default function ChatList({ activeChatId, chats, onChatClick, onCreateNewChatBtnClick }: Props) {
   return (
     <>
       <div className="flex justify-between items-center">

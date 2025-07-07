@@ -1,33 +1,28 @@
-import { useParams } from "@tanstack/react-router";
-import { useContext, useEffect, useState } from "react";
-import { GlobalContext } from "../context";
 import MessagesContainer from "../components/MessagesContainer";
 import Input from "../components/Input";
 import SendBtn from "../components/SendBtn";
 import Message from "../interfaces/Message";
 import Sidebar from "../components/Sidebar";
+
+import { useParams } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+
 import { api } from "../fetch";
+import { RootState } from "../store";
+import { setIsNewChatCreated } from "../store/chat/chat-slice";
 
 export default function ChatPage() {
+  const dispatch = useDispatch();
   const { chatId } = useParams({ from: '/$chatId' });
-  const context = useContext(GlobalContext);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputText, setInputText] = useState<string>(context.inputValue);
+  const [inputText, setInputText] = useState<string>('');
   const [isSendBtnActive, setIsSendBtnActive] = useState<boolean>(false);
-
-  const getChat = async () => {
-    try {
-      const { chatMessages }: { chatMessages: Message[] } = await api(`/chats/${chatId}`);
-      setMessages(chatMessages);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const isNewChatCreated = useSelector((state: RootState) => state.chat.isNewChatCreated);
 
   const addUserMessage = async (message: string): Promise<void> => {
     try {
       setMessages(prev => [...prev, { content: message, role: 'user' }]);
-      context.inputValue = '';
       setInputText('');
       await api(`/chats/${chatId}/user-message`, { method: 'POST', body: { message } });
     } catch (err) {
@@ -37,9 +32,6 @@ export default function ChatPage() {
 
   const addPrompt = async () => {
     try {
-      const trimmedInputValue = inputText.trim();
-      await addUserMessage(trimmedInputValue);
-
       const stream = await api(`/chats/${chatId}/generate-llm-response`, {
         method: 'POST',
         responseType: 'stream'
@@ -60,12 +52,25 @@ export default function ChatPage() {
   };
 
   useEffect(() => {
-    if (!context.newChatCreated) {
-      getChat();
-    } else if (context.newChatCreated) {
-      addPrompt();
-      context.newChatCreated = false;
-    }
+    const getChat = async () => {
+      try {
+        const { chatMessages }: { chatMessages: Message[] } = await api(`/chats/${chatId}`);
+        setMessages(chatMessages);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    const retrieveChatInfo = async () => {
+      if (!isNewChatCreated) {
+        getChat();
+      } else if (isNewChatCreated) {
+        await getChat();
+        await addPrompt();
+        dispatch(setIsNewChatCreated(false));
+      }
+    };
+    retrieveChatInfo();
   }, [chatId]);
 
   useEffect(() => {
@@ -81,9 +86,10 @@ export default function ChatPage() {
     addMessage();
   };
 
-  const addMessage = () => {
+  const addMessage = async () => {
     if (!isSendBtnActive) return;
-    addPrompt();
+    await addUserMessage(inputText.trim());
+    await addPrompt();
   };
 
   return (

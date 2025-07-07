@@ -8,6 +8,7 @@ A modern, minimal frontend for an AI chat application, built with React, TypeScr
 - [TypeScript](https://www.typescriptlang.org/) — Typed superset of JavaScript
 - [Vite](https://vitejs.dev/) — Next-generation frontend tooling
 - [TanStack Router](https://tanstack.com/router/latest) — Modern and scalable routing for React
+- [Redux Toolkit](https://redux-toolkit.js.org/) - A predictable state container for JavaScript applications
 - [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS framework
 - [ofetch](https://github.com/unjs/ofetch) — Lightweight fetch wrapper
 - [React Hook Form](https://www.react-hook-form.com/) - Performant, flexible and extensible forms with easy-to-use validation.

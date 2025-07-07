@@ -1,25 +1,23 @@
 import Avatar from "./Avatar";
-import { AUTH_TOKEN_KEY } from "../const";
-import { useNavigate } from "@tanstack/react-router";
-import { api } from "../fetch";
 
-export default function AccountSection() {
-  const navigate = useNavigate();
+interface User {
+  email: string;
+  firstName: string;
+  lastName: string;
+}
 
-  const handleLogout = async () => {
-    await api('/auth/logout', {
-      method: 'POST'
-    });
-    localStorage.removeItem(AUTH_TOKEN_KEY);
-    navigate({ to: '/login' });
-  };
+interface Props {
+  user: User;
+  onAvatarClick: () => void;
+}
 
+export default function AccountSection({ onAvatarClick, user }: Props) {
   return (
     <div className="flex gap-3.5">
-      <Avatar onClick={handleLogout} />
+      <Avatar onClick={onAvatarClick} />
       <div className="flex flex-col justify-center gap-1 font-secondary text-sm">
-        <span className="font-bold">John Doe</span>
-        <span className="font-medium">email@email.com</span>
+        <span className="font-bold">{user.firstName} {user.lastName}</span>
+        <span className="font-medium">{user.email}</span>
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ export default function ChatPage() {
   const { chatId } = useParams({ from: '/$chatId' });
   const context = useContext(GlobalContext);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputText, setInputText] = useState<string>(context.inputValue);
+  const [inputText, setInputText] = useState<string>('');
   const [isSendBtnActive, setIsSendBtnActive] = useState<boolean>(false);
 
   const getChat = async () => {
@@ -27,7 +27,6 @@ export default function ChatPage() {
   const addUserMessage = async (message: string): Promise<void> => {
     try {
       setMessages(prev => [...prev, { content: message, role: 'user' }]);
-      context.inputValue = '';
       setInputText('');
       await api(`/chats/${chatId}/user-message`, { method: 'POST', body: { message } });
     } catch (err) {
@@ -37,9 +36,6 @@ export default function ChatPage() {
 
   const addPrompt = async () => {
     try {
-      const trimmedInputValue = inputText.trim();
-      await addUserMessage(trimmedInputValue);
-
       const stream = await api(`/chats/${chatId}/generate-llm-response`, {
         method: 'POST',
         responseType: 'stream'
@@ -81,9 +77,10 @@ export default function ChatPage() {
     addMessage();
   };
 
-  const addMessage = () => {
+  const addMessage = async () => {
     if (!isSendBtnActive) return;
-    addPrompt();
+    await addUserMessage(inputText.trim());
+    await addPrompt();
   };
 
   return (

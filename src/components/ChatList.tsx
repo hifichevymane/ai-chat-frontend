@@ -10,7 +10,7 @@ interface Chat {
 }
 
 interface Props {
-  activeChatId: string;
+  activeChatId: string | null;
 }
 
 export default function ChatList({ activeChatId }: Props) {

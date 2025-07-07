@@ -3,17 +3,18 @@ import StartingChatMessage from "../components/StartingChatMessage";
 import Input from "../components/Input";
 import SendBtn from "../components/SendBtn";
 
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { useDispatch } from "react-redux";
 
 import { api } from "../fetch";
-import { GlobalContext } from "../context";
+import { setIsNewChatCreated } from "../store/chat/chat-slice";
 
 export default function HomePage() {
-  const context = useContext(GlobalContext);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [isSendBtnActive, setIsSendBtnActive] = useState<boolean>(false);
   const [inputText, setInputText] = useState<string>('');
-  const navigate = useNavigate();
 
   useEffect(() => {
     setIsSendBtnActive(!!inputText.trim());
@@ -40,7 +41,7 @@ export default function HomePage() {
         body: { message }
       });
 
-      context.newChatCreated = true;
+      dispatch(setIsNewChatCreated(true));
       navigate({ to: '/$chatId', params: { chatId: id } });
     } catch (err) {
       console.error(err);

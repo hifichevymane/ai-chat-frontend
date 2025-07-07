@@ -1,19 +1,24 @@
-import { useParams } from "@tanstack/react-router";
-import { useContext, useEffect, useState } from "react";
-import { GlobalContext } from "../context";
 import MessagesContainer from "../components/MessagesContainer";
 import Input from "../components/Input";
 import SendBtn from "../components/SendBtn";
 import Message from "../interfaces/Message";
 import Sidebar from "../components/Sidebar";
+
+import { useParams } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+
 import { api } from "../fetch";
+import { RootState } from "../store";
+import { setIsNewChatCreated } from "../store/chat/chat-slice";
 
 export default function ChatPage() {
+  const dispatch = useDispatch();
   const { chatId } = useParams({ from: '/$chatId' });
-  const context = useContext(GlobalContext);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState<string>('');
   const [isSendBtnActive, setIsSendBtnActive] = useState<boolean>(false);
+  const isNewChatCreated = useSelector((state: RootState) => state.chat.isNewChatCreated);
 
   const getChat = async () => {
     try {
@@ -56,12 +61,16 @@ export default function ChatPage() {
   };
 
   useEffect(() => {
-    if (!context.newChatCreated) {
-      getChat();
-    } else if (context.newChatCreated) {
-      addPrompt();
-      context.newChatCreated = false;
-    }
+    const retrieveChatInfo = async () => {
+      if (!isNewChatCreated) {
+        getChat();
+      } else if (isNewChatCreated) {
+        await getChat();
+        await addPrompt();
+        dispatch(setIsNewChatCreated(false));
+      }
+    };
+    retrieveChatInfo();
   }, [chatId]);
 
   useEffect(() => {

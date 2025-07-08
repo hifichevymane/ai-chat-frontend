@@ -5,7 +5,7 @@ import Message from "../interfaces/Message";
 import Sidebar from "../components/Sidebar";
 
 import { useParams } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import { api } from "../fetch";
@@ -30,7 +30,7 @@ export default function ChatPage() {
     }
   };
 
-  const addPrompt = async () => {
+  const addPrompt = useCallback(async () => {
     try {
       const stream = await api(`/chats/${chatId}/generate-llm-response`, {
         method: 'POST',
@@ -49,29 +49,22 @@ export default function ChatPage() {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [chatId]);
 
   useEffect(() => {
-    const getChat = async () => {
+    const retrieveChatInfo = async () => {
       try {
         const { chatMessages }: { chatMessages: Message[] } = await api(`/chats/${chatId}`);
         setMessages(chatMessages);
+        if (!isNewChatCreated) return;
+        await addPrompt();
+        dispatch(setIsNewChatCreated(false));
       } catch (err) {
         console.error(err);
       }
     };
-
-    const retrieveChatInfo = async () => {
-      if (!isNewChatCreated) {
-        getChat();
-      } else if (isNewChatCreated) {
-        await getChat();
-        await addPrompt();
-        dispatch(setIsNewChatCreated(false));
-      }
-    };
     retrieveChatInfo();
-  }, [chatId]);
+  }, [chatId, isNewChatCreated, dispatch, addPrompt]);
 
   useEffect(() => {
     setIsSendBtnActive(!!inputText.trim());

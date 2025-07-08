@@ -1,10 +1,11 @@
 import AccountSection from "./AccountSection";
 import ChatList from "./ChatList";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { jwtDecode } from 'jwt-decode';
 import { useDispatch, useSelector } from "react-redux";
+import { useQuery } from "@tanstack/react-query";
 
 import { api } from "../fetch";
 import { AUTH_TOKEN_KEY } from "../const";
@@ -19,25 +20,28 @@ interface TokenPayload {
   lastName: string;
 }
 
+const getChats = async () => {
+  try {
+    const chats = await api<ChatListItem[]>('/chats');
+    return chats;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 export default function Sidebar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { chatId } = useParams({ strict: false });
-  const [chats, setChats] = useState<ChatListItem[]>([]);
   const user = useSelector((state: RootState) => state.user);
 
-  useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        const chats: ChatListItem[] = await api('/chats');
-        setChats(chats);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchChats();
+  const { data: chats = [] } = useQuery({
+    queryKey: ['chats'],
+    queryFn: getChats
+  });
 
+  useEffect(() => {
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     if (!token) return;
     const { sub: id, email, firstName, lastName } = jwtDecode<TokenPayload>(token);

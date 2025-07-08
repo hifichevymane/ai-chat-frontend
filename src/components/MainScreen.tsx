@@ -5,16 +5,12 @@ import Message from "../interfaces/Message";
 import MessagesContainer from "./MessagesContainer";
 
 import { api } from "../fetch";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function MainScreen() {
-  const [isSendBtnActive, setIsSendBtnActive] = useState<boolean>(false);
   const [inputText, setInputText] = useState<string>('');
   const [messages, setMessages] = useState<Message[]>([]);
-
-  useEffect(() => {
-    setIsSendBtnActive(!!inputText.trim());
-  }, [inputText]);
+  const isSendBtnActive = !!inputText.trim();
 
   const onInput: React.ChangeEventHandler<HTMLInputElement> = ({ target }) => {
     setInputText(target.value);

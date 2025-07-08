@@ -3,7 +3,7 @@ import StartingChatMessage from "../components/StartingChatMessage";
 import Input from "../components/Input";
 import SendBtn from "../components/SendBtn";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useDispatch } from "react-redux";
 
@@ -13,12 +13,9 @@ import { setIsNewChatCreated } from "../store/chat/chat-slice";
 export default function HomePage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [isSendBtnActive, setIsSendBtnActive] = useState<boolean>(false);
   const [inputText, setInputText] = useState<string>('');
 
-  useEffect(() => {
-    setIsSendBtnActive(!!inputText.trim());
-  }, [inputText]);
+  const isSendBtnActive = !!inputText.trim();
 
   const onInput: React.ChangeEventHandler<HTMLInputElement> = ({ target }) => {
     setInputText(target.value);

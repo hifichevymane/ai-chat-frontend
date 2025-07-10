@@ -4,14 +4,13 @@ import ChatList from "./ChatList";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { jwtDecode } from 'jwt-decode';
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 
 import { api } from "../fetch";
 import { AUTH_TOKEN_KEY } from "../const";
 import { ChatListItem } from "../interfaces/ChatListItem";
 import { setUser } from "../store/user/user-slice";
-import { RootState } from "../store";
 
 interface TokenPayload {
   sub: string;
@@ -34,7 +33,6 @@ export default function Sidebar() {
   const navigate = useNavigate();
 
   const { chatId } = useParams({ strict: false });
-  const user = useSelector((state: RootState) => state.user);
 
   const { data: chats = [] } = useQuery({
     queryKey: ['chats'],
@@ -53,22 +51,6 @@ export default function Sidebar() {
     }));
   }, [dispatch]);
 
-  const logout = async () => {
-    await api('/auth/logout', {
-      method: 'POST'
-    });
-
-    localStorage.removeItem(AUTH_TOKEN_KEY);
-    dispatch(setUser({
-      id: '',
-      email: '',
-      firstName: '',
-      lastName: '',
-    }));
-
-    navigate({ to: '/login' });
-  };
-
   const navigateToChat = (id: string) => navigate({ to: '/$chatId', params: { chatId: id } });
   const navigateToHome = () => navigate({ to: '/' });
 
@@ -80,7 +62,7 @@ export default function Sidebar() {
         onChatClick={navigateToChat}
         onCreateNewChatBtnClick={navigateToHome}
       />
-      <AccountSection onAvatarClick={logout} user={user} />
+      <AccountSection />
     </aside>
   );
 }

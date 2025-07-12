@@ -73,3 +73,5 @@ pnpm preview
 - `pnpm build` — Build the app for production
 - `pnpm preview` — Preview the production build
 - `pnpm lint` — Run ESLint on the codebase
+- `pnpm docker:dev` - Run Docker container in Development environment
+- `pnpm docker:prod` - Run Docker container in Production environment

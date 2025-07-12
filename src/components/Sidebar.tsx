@@ -1,73 +1,24 @@
 import AccountSection from "./AccountSection";
 import ChatList from "./ChatList";
 
-import { useEffect } from "react";
 import { useNavigate, useParams } from "@tanstack/react-router";
-import { jwtDecode } from 'jwt-decode';
-import { useDispatch, useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 
 import { api } from "../fetch";
-import { AUTH_TOKEN_KEY } from "../const";
 import { ChatListItem } from "../interfaces/ChatListItem";
-import { setUser } from "../store/user/user-slice";
-import { RootState } from "../store";
-
-interface TokenPayload {
-  sub: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-}
-
-const getChats = async () => {
-  try {
-    const chats = await api<ChatListItem[]>('/chats');
-    return chats;
-  } catch (err) {
-    console.error(err);
-  }
-};
 
 export default function Sidebar() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { chatId } = useParams({ strict: false });
-  const user = useSelector((state: RootState) => state.user);
 
-  const { data: chats = [] } = useQuery({
+  const { data: chats = [] } = useQuery<ChatListItem[]>({
     queryKey: ['chats'],
-    queryFn: getChats
+    queryFn: async () => {
+      const chats = await api<ChatListItem[]>('/chats');
+      return chats;
+    }
   });
-
-  useEffect(() => {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    if (!token) return;
-    const { sub: id, email, firstName, lastName } = jwtDecode<TokenPayload>(token);
-    dispatch(setUser({
-      id,
-      email,
-      firstName,
-      lastName,
-    }));
-  }, [dispatch]);
-
-  const logout = async () => {
-    await api('/auth/logout', {
-      method: 'POST'
-    });
-
-    localStorage.removeItem(AUTH_TOKEN_KEY);
-    dispatch(setUser({
-      id: '',
-      email: '',
-      firstName: '',
-      lastName: '',
-    }));
-
-    navigate({ to: '/login' });
-  };
 
   const navigateToChat = (id: string) => navigate({ to: '/$chatId', params: { chatId: id } });
   const navigateToHome = () => navigate({ to: '/' });
@@ -80,7 +31,7 @@ export default function Sidebar() {
         onChatClick={navigateToChat}
         onCreateNewChatBtnClick={navigateToHome}
       />
-      <AccountSection onAvatarClick={logout} user={user} />
+      <AccountSection />
     </aside>
   );
 }

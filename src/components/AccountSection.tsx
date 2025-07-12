@@ -1,23 +1,72 @@
 import Avatar from "./Avatar";
+import AccountSettings from "./AccountSettings";
 
-interface User {
-  email: string;
-  firstName: string;
-  lastName: string;
-}
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-interface Props {
-  user: User;
-  onAvatarClick: () => void;
-}
+import { api } from "../fetch";
+import { AUTH_TOKEN_KEY } from "../const";
+import { setUser, clearUser } from "../store/user/user-slice";
+import User from "../interfaces/User";
 
-export default function AccountSection({ onAvatarClick, user }: Props) {
+export default function AccountSection() {
+  const queryClient = useQueryClient();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { data: user, isLoading, isError } = useQuery<User>({
+    queryKey: ['auth', 'me'],
+    queryFn: async () => {
+      const currentUser = await api<User>('/auth/me');
+      dispatch(setUser(currentUser));
+      return currentUser;
+    },
+    staleTime: Infinity,
+  });
+  const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState(false);
+
+  const logout = async () => {
+    await api('/auth/logout', {
+      method: 'POST'
+    });
+
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    dispatch(clearUser());
+    queryClient.removeQueries({ queryKey: ['auth', 'me'] });
+
+    navigate({ to: '/login' });
+  };
+
+  const updateUser = async (data: Pick<User, 'firstName' | 'lastName'>) => {
+    const updatedUser = await api<User>(`/users/${user?.id}`, {
+      method: 'PATCH',
+      body: data,
+    });
+    queryClient.setQueryData(['auth', 'me'], updatedUser);
+  };
+
+  if (isLoading || isError) {
+    return (
+      <div className="flex gap-3.5">
+        <span>Loading...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="flex gap-3.5">
-      <Avatar onClick={onAvatarClick} />
+      <Avatar onClick={() => setIsAccountSettingsOpen(true)} />
+      <AccountSettings
+        isOpen={isAccountSettingsOpen}
+        onClose={() => setIsAccountSettingsOpen(false)}
+        onEdit={updateUser}
+        onLogout={logout}
+      />
       <div className="flex flex-col justify-center gap-1 font-secondary text-sm">
-        <span className="font-bold">{user.firstName} {user.lastName}</span>
-        <span className="font-medium">{user.email}</span>
+        <span className="font-bold">{user?.firstName} {user?.lastName}</span>
+        <span className="font-medium">{user?.email}</span>
       </div>
     </div>
   );

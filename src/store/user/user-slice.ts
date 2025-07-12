@@ -1,17 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import User from "../../interfaces/User";
 
-export interface UserState {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-}
+type UserState = User;
 
 const initialState: UserState = {
   id: '',
   email: '',
   firstName: '',
   lastName: '',
+  createdAt: '',
+  updatedAt: '',
 };
 
 export const userSlice = createSlice({
@@ -23,10 +21,21 @@ export const userSlice = createSlice({
       state.email = action.payload.email;
       state.firstName = action.payload.firstName;
       state.lastName = action.payload.lastName;
+      state.createdAt = action.payload.createdAt;
+      state.updatedAt = action.payload.updatedAt;
+    },
+
+    clearUser: (state) => {
+      state.id = '';
+      state.email = '';
+      state.firstName = '';
+      state.lastName = '';
+      state.createdAt = '';
+      state.updatedAt = '';
     }
   }
 });
 
-export const { setUser } = userSlice.actions;
+export const { setUser, clearUser } = userSlice.actions;
 
 export default userSlice.reducer;

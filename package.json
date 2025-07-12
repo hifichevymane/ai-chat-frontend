@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up --build"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",

@@ -1,8 +1,12 @@
+name: ai-chat-frontend-prod
+
 services:
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile.prod
+      target: production
+    env_file:
+      - .env
     ports:
       - '80:80'
     restart: unless-stopped

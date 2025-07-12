@@ -2,19 +2,29 @@ import Avatar from "./Avatar";
 import AccountSettings from "./AccountSettings";
 
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { api } from "../fetch";
 import { AUTH_TOKEN_KEY } from "../const";
-import { setUser, UserState } from "../store/user/user-slice";
-import { RootState } from "../store";
+import { setUser, clearUser } from "../store/user/user-slice";
+import User from "../interfaces/User";
 
 export default function AccountSection() {
+  const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const user = useSelector((state: RootState) => state.user);
+  const { data: user, isLoading, isError } = useQuery<User>({
+    queryKey: ['auth', 'me'],
+    queryFn: async () => {
+      const currentUser = await api<User>('/auth/me');
+      dispatch(setUser(currentUser));
+      return currentUser;
+    },
+    staleTime: Infinity,
+  });
   const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState(false);
 
   const logout = async () => {
@@ -23,24 +33,27 @@ export default function AccountSection() {
     });
 
     localStorage.removeItem(AUTH_TOKEN_KEY);
-    dispatch(setUser({
-      id: '',
-      email: '',
-      firstName: '',
-      lastName: '',
-    }));
+    dispatch(clearUser());
+    queryClient.removeQueries({ queryKey: ['auth', 'me'] });
 
     navigate({ to: '/login' });
   };
 
-  const updateUser = async (data: Pick<UserState, 'firstName' | 'lastName'>) => {
-    dispatch(setUser({ ...user, ...data }));
-
-    await api(`/users/${user.id}`, {
+  const updateUser = async (data: Pick<User, 'firstName' | 'lastName'>) => {
+    const updatedUser = await api<User>(`/users/${user?.id}`, {
       method: 'PATCH',
       body: data,
     });
+    queryClient.setQueryData(['auth', 'me'], updatedUser);
   };
+
+  if (isLoading || isError) {
+    return (
+      <div className="flex gap-3.5">
+        <span>Loading...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="flex gap-3.5">
@@ -52,8 +65,8 @@ export default function AccountSection() {
         onLogout={logout}
       />
       <div className="flex flex-col justify-center gap-1 font-secondary text-sm">
-        <span className="font-bold">{user.firstName} {user.lastName}</span>
-        <span className="font-medium">{user.email}</span>
+        <span className="font-bold">{user?.firstName} {user?.lastName}</span>
+        <span className="font-medium">{user?.email}</span>
       </div>
     </div>
   );

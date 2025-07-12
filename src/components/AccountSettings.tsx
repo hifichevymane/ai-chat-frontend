@@ -5,12 +5,12 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { RootState } from "../store";
-import { UserState } from "../store/user/user-slice";
+import User from "../interfaces/User";
 
 interface Props {
   isOpen: boolean;
   onClose?: () => void;
-  onEdit?: (data: Pick<UserState, 'firstName' | 'lastName'>) => void;
+  onEdit?: (data: Pick<User, 'firstName' | 'lastName'>) => void;
   onLogout?: () => void;
 }
 

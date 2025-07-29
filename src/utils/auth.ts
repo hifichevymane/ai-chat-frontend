@@ -6,12 +6,7 @@ export const isAuthenticated = async () => {
   const token = localStorage.getItem(AUTH_TOKEN_KEY);
   if (!token) return false;
   try {
-    const { valid } = await api('/auth/verify', {
-      method: 'POST',
-      body: {
-        token,
-      },
-    });
+    const { data: { valid } } = await api.post<{ valid: boolean }>('/auth/verify', { token });
     return valid;
   } catch (error) {
     console.error(error);

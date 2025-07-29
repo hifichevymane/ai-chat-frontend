@@ -32,10 +32,14 @@ export default function SignUpPage() {
   const onSubmit = async (data: SignUpFormValues) => {
     try {
       const { firstName, lastName, email, password, confirmPassword } = data;
-      const { token } = await api("/auth/sign-up", {
-        method: "POST",
-        body: { firstName, lastName, email, password, confirmPassword },
+      const { data: { token } } = await api.post<{ token: string }>("/auth/sign-up", {
+        firstName,
+        lastName,
+        email,
+        password,
+        confirmPassword
       });
+
       localStorage.setItem(AUTH_TOKEN_KEY, token);
       navigate({ to: "/" });
     } catch (error) {

@@ -31,10 +31,7 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      const { token } = await api("/auth/login", {
-        method: "POST",
-        body: data,
-      });
+      const { data: { token } } = await api.post<{ token: string }>("/auth/login", data);
       localStorage.setItem(AUTH_TOKEN_KEY, token);
       navigate({ to: "/" });
     } catch (error) {

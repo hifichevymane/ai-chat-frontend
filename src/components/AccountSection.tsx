@@ -19,7 +19,7 @@ export default function AccountSection() {
   const { data: user, isLoading, isError } = useQuery<User>({
     queryKey: ['auth', 'me'],
     queryFn: async () => {
-      const currentUser = await api<User>('/auth/me');
+      const { data: currentUser } = await api.get<User>('/auth/me');
       dispatch(setUser(currentUser));
       return currentUser;
     },
@@ -28,9 +28,7 @@ export default function AccountSection() {
   const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState(false);
 
   const logout = async () => {
-    await api('/auth/logout', {
-      method: 'POST'
-    });
+    await api.post('/auth/logout');
 
     localStorage.removeItem(AUTH_TOKEN_KEY);
     dispatch(clearUser());
@@ -40,10 +38,7 @@ export default function AccountSection() {
   };
 
   const updateUser = async (data: Pick<User, 'firstName' | 'lastName'>) => {
-    const updatedUser = await api<User>(`/users/${user?.id}`, {
-      method: 'PATCH',
-      body: data,
-    });
+    const { data: updatedUser } = await api.patch<User>(`/users/${user?.id}`, data);
     queryClient.setQueryData(['auth', 'me'], updatedUser);
   };
 

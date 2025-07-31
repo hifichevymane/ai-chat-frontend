@@ -1,8 +1,11 @@
 import ChatPage from '../pages/Chat';
-import { createFileRoute } from '@tanstack/react-router';
-import { redirectToLoginIfNotAuthenticated } from '../utils/auth';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/$chatId')({
   component: ChatPage,
-  beforeLoad: redirectToLoginIfNotAuthenticated,
+  beforeLoad: ({ context }) => {
+    if (!context.auth.accessToken) {
+      throw redirect({ to: "/login" });
+    }
+  },
 });

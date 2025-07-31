@@ -1,8 +1,11 @@
 import SignUpPage from '../pages/SignUp';
-import { createFileRoute } from '@tanstack/react-router';
-import { redirectToHomeIfAuthenticated } from '../utils/auth';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/sign-up')({
   component: SignUpPage,
-  beforeLoad: redirectToHomeIfAuthenticated,
+  beforeLoad: ({ context }) => {
+    if (context.auth.accessToken) {
+      throw redirect({ to: "/" });
+    }
+  },
 });

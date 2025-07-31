@@ -2,17 +2,19 @@ import { useState, useLayoutEffect, useEffect } from "react";
 import { api } from "../fetch";
 import User from "../interfaces/User";
 import { AuthContext } from "../auth";
-import { useNavigate } from "@tanstack/react-router";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const navigate = useNavigate();
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: user } = await api.get('/auth/me');
-      setUser(user);
+      try {
+        const { data: user } = await api.get<User>('/auth/me');
+        setUser(user);
+      } catch {
+        setUser(null);
+      }
     };
     fetchUser();
   }, []);
@@ -22,6 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       config.headers.Authorization = !config._retry && accessToken
         ? `Bearer ${accessToken}`
         : config.headers.Authorization;
+      console.log(accessToken);
       return config;
     });
 
@@ -39,19 +42,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error.response.status === 401) {
           try {
             const { data: { token } } = await api.post<{ token: string }>('/auth/refresh');
-            setAccessToken(token);
 
+            setAccessToken(token);
             originalRequest.headers.Authorization = `Bearer ${token}`;
             originalRequest._retry = true;
 
-            const { data: user } = await api.get('/auth/me');
-            setUser(user);
-
             return api(originalRequest);
-          } catch {
+          } catch (refreshError) {
             setAccessToken(null);
             setUser(null);
-            navigate({ to: '/login' });
+            return Promise.reject(refreshError);
           }
         }
 
@@ -62,10 +62,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       api.interceptors.response.eject(responseInterceptor);
     };
-  }, [navigate]);
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ accessToken, user }}>
+    <AuthContext.Provider value={{ accessToken, user, setAccessToken }}>
       {children}
     </AuthContext.Provider>
   );

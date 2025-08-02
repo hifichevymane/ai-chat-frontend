@@ -32,7 +32,14 @@ export default function ChatPage() {
 
   const addPrompt = useCallback(async () => {
     try {
-      const { data: stream } = await api.post(`/chats/${chatId}/generate-llm-response`, {}, { responseType: 'stream' });
+      const { data: stream } = await api.post(
+        `/chats/${chatId}/generate-llm-response`,
+        {},
+        {
+          responseType: 'stream',
+          adapter: 'fetch'
+        }
+      );
       const llmMessage: Message = { content: '', role: 'assistant' };
       setMessages(prev => [...prev, llmMessage]);
 
@@ -50,7 +57,7 @@ export default function ChatPage() {
   useEffect(() => {
     const retrieveChatInfo = async () => {
       try {
-        const { data: chatMessages } = await api.get<Message[]>(`/chats/${chatId}`);
+        const { data: { chatMessages } } = await api.get<{ chatMessages: Message[] }>(`/chats/${chatId}`);
         setMessages(chatMessages);
         if (!isNewChatCreated) return;
         await addPrompt();

@@ -3,32 +3,36 @@ import AccountSettings from "./AccountSettings";
 
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { useAuth } from "../hooks";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useDispatch } from "react-redux";
+import { setUser, clearUser } from "../store/user/user-slice";
 
+import { useAuth } from "../hooks";
 import { api } from "../fetch";
 import User from "../interfaces/User";
 
 export default function AccountSection() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const queryClient = useQueryClient();
-  const { isPending, accessToken, setAccessToken } = useAuth();
 
+  const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState(false);
+  const { isPending, accessToken, setAccessToken } = useAuth();
   const { data: user } = useQuery({
     queryKey: ['auth', 'me'],
     queryFn: async () => {
       const { data: user } = await api.get<User>('/auth/me');
+      dispatch(setUser(user));
       return user;
     },
     enabled: !!accessToken,
     staleTime: Infinity,
   });
 
-  const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState(false);
-
   const logout = async () => {
     await api.post('/auth/logout');
     setAccessToken(null);
+    dispatch(clearUser());
     queryClient.removeQueries({ queryKey: ['auth', 'me'] });
     navigate({ to: '/login' });
   };

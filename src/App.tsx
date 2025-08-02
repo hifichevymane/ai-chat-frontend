@@ -5,6 +5,10 @@ import { router } from "./router";
 
 function InnerApp() {
   const auth = useAuth();
+  if (auth.isPending) {
+    return <div>Loading...</div>;
+  }
+
   return <RouterProvider router={router} context={{ auth }} />;
 }
 

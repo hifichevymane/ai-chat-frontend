@@ -2,38 +2,34 @@ import Avatar from "./Avatar";
 import AccountSettings from "./AccountSettings";
 
 import { useState } from "react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "@tanstack/react-router";
+import { useAuth } from "../hooks";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { api } from "../fetch";
-import { AUTH_TOKEN_KEY } from "../const";
-import { setUser, clearUser } from "../store/user/user-slice";
 import User from "../interfaces/User";
 
 export default function AccountSection() {
-  const queryClient = useQueryClient();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { isPending, accessToken, setAccessToken } = useAuth();
 
-  const { data: user, isLoading, isError } = useQuery<User>({
+  const { data: user } = useQuery({
     queryKey: ['auth', 'me'],
     queryFn: async () => {
-      const { data: currentUser } = await api.get<User>('/auth/me');
-      dispatch(setUser(currentUser));
-      return currentUser;
+      const { data: user } = await api.get<User>('/auth/me');
+      return user;
     },
+    enabled: !!accessToken,
     staleTime: Infinity,
   });
+
   const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState(false);
 
   const logout = async () => {
     await api.post('/auth/logout');
-
-    localStorage.removeItem(AUTH_TOKEN_KEY);
-    dispatch(clearUser());
+    setAccessToken(null);
     queryClient.removeQueries({ queryKey: ['auth', 'me'] });
-
     navigate({ to: '/login' });
   };
 
@@ -42,7 +38,7 @@ export default function AccountSection() {
     queryClient.setQueryData(['auth', 'me'], updatedUser);
   };
 
-  if (isLoading || isError) {
+  if (isPending) {
     return (
       <div className="flex gap-3.5">
         <span>Loading...</span>

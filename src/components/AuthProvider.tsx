@@ -1,19 +1,20 @@
 import { useState, useLayoutEffect, useEffect } from "react";
 import { api } from "../fetch";
-import User from "../interfaces/User";
 import { AuthContext } from "../auth";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
+  const [isPending, setIsPending] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data: user } = await api.get<User>('/auth/me');
-        setUser(user);
+        const { data: { accessToken } } = await api.post<{ accessToken: string }>('/auth/refresh');
+        setAccessToken(accessToken);
       } catch {
-        setUser(null);
+        setAccessToken(null);
+      } finally {
+        setIsPending(false);
       }
     };
     fetchUser();
@@ -24,7 +25,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       config.headers.Authorization = !config._retry && accessToken
         ? `Bearer ${accessToken}`
         : config.headers.Authorization;
-      console.log(accessToken);
       return config;
     });
 
@@ -39,18 +39,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async (error) => {
         const originalRequest = error.config;
 
-        if (error.response.status === 401) {
+        if (error.response.status === 401 && originalRequest.url !== '/auth/refresh') {
           try {
-            const { data: { token } } = await api.post<{ token: string }>('/auth/refresh');
-
-            setAccessToken(token);
-            originalRequest.headers.Authorization = `Bearer ${token}`;
+            const { data: { accessToken } } = await api.post<{ accessToken: string }>('/auth/refresh');
+            setAccessToken(accessToken);
+            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
             originalRequest._retry = true;
 
             return api(originalRequest);
           } catch (refreshError) {
             setAccessToken(null);
-            setUser(null);
             return Promise.reject(refreshError);
           }
         }
@@ -65,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ accessToken, user, setAccessToken }}>
+    <AuthContext.Provider value={{ accessToken, setAccessToken, isPending }}>
       {children}
     </AuthContext.Provider>
   );

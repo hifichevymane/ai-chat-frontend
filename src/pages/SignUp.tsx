@@ -3,7 +3,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, Link } from "@tanstack/react-router";
 import { api } from "../fetch";
-import { AUTH_TOKEN_KEY } from "../const";
+import { useAuth } from "../hooks";
 
 const signUpValidationSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required" }).max(64, { message: "First name must be less than 64 characters" }),
@@ -20,6 +20,8 @@ type SignUpFormValues = z.infer<typeof signUpValidationSchema>;
 
 export default function SignUpPage() {
   const navigate = useNavigate();
+  const { setAccessToken } = useAuth();
+
   const {
     register,
     handleSubmit,
@@ -32,15 +34,14 @@ export default function SignUpPage() {
   const onSubmit = async (data: SignUpFormValues) => {
     try {
       const { firstName, lastName, email, password, confirmPassword } = data;
-      const { data: { token } } = await api.post<{ token: string }>("/auth/sign-up", {
+      const { data: { accessToken } } = await api.post<{ accessToken: string }>("/auth/sign-up", {
         firstName,
         lastName,
         email,
         password,
         confirmPassword
       });
-
-      localStorage.setItem(AUTH_TOKEN_KEY, token);
+      setAccessToken(accessToken);
       navigate({ to: "/" });
     } catch (error) {
       console.error(error);

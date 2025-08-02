@@ -33,8 +33,8 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      const { data: { token } } = await api.post<{ token: string }>("/auth/login", data);
-      setAccessToken(token);
+      const { data: { accessToken } } = await api.post<{ accessToken: string }>("/auth/login", data);
+      setAccessToken(accessToken);
       navigate({ to: "/" });
     } catch (error) {
       console.error(error);

@@ -1,10 +1,9 @@
 import { createContext } from "react";
-import User from "./interfaces/User";
 
 export interface AuthContextState {
   accessToken: string | null;
-  user: User | null;
   setAccessToken: (accessToken: string | null) => void;
+  isPending: boolean;
 }
 
 export const AuthContext = createContext<AuthContextState | null>(null);

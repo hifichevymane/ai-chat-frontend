@@ -35,10 +35,7 @@ export default function ChatPage() {
       const { data: stream } = await api.post(
         `/chats/${chatId}/generate-llm-response`,
         {},
-        {
-          responseType: 'stream',
-          adapter: 'fetch'
-        }
+        { responseType: 'stream' }
       );
       const llmMessage: Message = { content: '', role: 'assistant' };
       setMessages(prev => [...prev, llmMessage]);

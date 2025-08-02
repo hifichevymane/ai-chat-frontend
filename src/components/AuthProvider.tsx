@@ -7,6 +7,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isPending, setIsPending] = useState(true);
 
   useEffect(() => {
+    const handleBeforeUnload = () => api.post('/auth/invalidate-access-token');
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     const fetchUser = async () => {
       try {
         const { data: { accessToken } } = await api.post<{ accessToken: string }>('/auth/refresh');
@@ -18,6 +21,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     };
     fetchUser();
+
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, []);
 
   useLayoutEffect(() => {

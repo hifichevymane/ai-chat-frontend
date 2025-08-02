@@ -15,7 +15,7 @@ export default function Sidebar() {
   const { data: chats = [] } = useQuery<ChatListItem[]>({
     queryKey: ['chats'],
     queryFn: async () => {
-      const chats = await api<ChatListItem[]>('/chats');
+      const { data: chats } = await api.get<ChatListItem[]>('/chats');
       return chats;
     }
   });

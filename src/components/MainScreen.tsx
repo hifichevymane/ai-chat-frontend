@@ -29,16 +29,11 @@ export default function MainScreen() {
       setMessages(prev => [...prev, { content: trimmedInputValue, role: 'user' }]);
       setInputText('');
 
-      const stream = await api('/chat', {
-        method: 'POST',
-        body: { prompt: trimmedInputValue },
-        responseType: 'stream'
-      });
+      const { data: stream } = await api.post('/chat', { prompt: trimmedInputValue }, { responseType: 'stream' });
       const llmMessage: Message = { content: '', role: 'assistant' };
       setMessages(prev => [...prev, llmMessage]);
 
       const decoder = new TextDecoder();
-      // @ts-expect-error Stream does implement the async iterable
       for await (const chunk of stream) {
         const decodedChunk = decoder.decode(chunk);
         llmMessage.content += decodedChunk;

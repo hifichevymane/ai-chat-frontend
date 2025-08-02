@@ -2,9 +2,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate, Link } from "@tanstack/react-router";
+import { useAuth } from "../hooks";
 
 import { api } from "../fetch";
-import { AUTH_TOKEN_KEY } from "../const";
 
 const loginValidationSchema = z.object({
   email: z.string()
@@ -20,6 +20,8 @@ type LoginFormValues = z.infer<typeof loginValidationSchema>;
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { setAccessToken } = useAuth();
+
   const {
     register,
     handleSubmit,
@@ -31,11 +33,8 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      const { token } = await api("/auth/login", {
-        method: "POST",
-        body: data,
-      });
-      localStorage.setItem(AUTH_TOKEN_KEY, token);
+      const { data: { accessToken } } = await api.post<{ accessToken: string }>("/auth/login", data);
+      setAccessToken(accessToken);
       navigate({ to: "/" });
     } catch (error) {
       console.error(error);

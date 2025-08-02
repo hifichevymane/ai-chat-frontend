@@ -1,0 +1,21 @@
+import { RouterProvider } from "@tanstack/react-router";
+import { useAuth } from "./hooks";
+import { AuthProvider } from "./components/AuthProvider";
+import { router } from "./router";
+
+function InnerApp() {
+  const auth = useAuth();
+  if (auth.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  return <RouterProvider router={router} context={{ auth }} />;
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <InnerApp />
+    </AuthProvider>
+  );
+}

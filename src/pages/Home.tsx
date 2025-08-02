@@ -31,12 +31,9 @@ export default function HomePage() {
 
     try {
       const message = inputText.trim();
-      const { id } = await api('/chats', { method: 'POST' });
+      const { data: { id } } = await api.post<{ id: string }>('/chats');
 
-      await api(`/chats/${id}/user-message`, {
-        method: 'POST',
-        body: { message }
-      });
+      await api.post(`/chats/${id}/user-message`, { message });
 
       dispatch(setIsNewChatCreated(true));
       navigate({ to: '/$chatId', params: { chatId: id } });

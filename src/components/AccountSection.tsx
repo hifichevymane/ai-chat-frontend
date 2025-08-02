@@ -2,52 +2,47 @@ import Avatar from "./Avatar";
 import AccountSettings from "./AccountSettings";
 
 import { useState } from "react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-
-import { api } from "../fetch";
-import { AUTH_TOKEN_KEY } from "../const";
+import { useDispatch } from "react-redux";
 import { setUser, clearUser } from "../store/user/user-slice";
+
+import { useAuth } from "../hooks";
+import { api } from "../fetch";
 import User from "../interfaces/User";
 
 export default function AccountSection() {
-  const queryClient = useQueryClient();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
-  const { data: user, isLoading, isError } = useQuery<User>({
+  const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState(false);
+  const { isPending, accessToken, setAccessToken } = useAuth();
+  const { data: user } = useQuery({
     queryKey: ['auth', 'me'],
     queryFn: async () => {
-      const currentUser = await api<User>('/auth/me');
-      dispatch(setUser(currentUser));
-      return currentUser;
+      const { data: user } = await api.get<User>('/auth/me');
+      dispatch(setUser(user));
+      return user;
     },
+    enabled: !!accessToken,
     staleTime: Infinity,
   });
-  const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState(false);
 
   const logout = async () => {
-    await api('/auth/logout', {
-      method: 'POST'
-    });
-
-    localStorage.removeItem(AUTH_TOKEN_KEY);
+    await api.post('/auth/logout');
+    setAccessToken(null);
     dispatch(clearUser());
     queryClient.removeQueries({ queryKey: ['auth', 'me'] });
-
     navigate({ to: '/login' });
   };
 
   const updateUser = async (data: Pick<User, 'firstName' | 'lastName'>) => {
-    const updatedUser = await api<User>(`/users/${user?.id}`, {
-      method: 'PATCH',
-      body: data,
-    });
+    const { data: updatedUser } = await api.patch<User>(`/users/${user?.id}`, data);
     queryClient.setQueryData(['auth', 'me'], updatedUser);
   };
 
-  if (isLoading || isError) {
+  if (isPending) {
     return (
       <div className="flex gap-3.5">
         <span>Loading...</span>

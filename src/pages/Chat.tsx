@@ -24,7 +24,7 @@ export default function ChatPage() {
     try {
       setMessages(prev => [...prev, { content: message, role: 'user' }]);
       setInputText('');
-      await api(`/chats/${chatId}/user-message`, { method: 'POST', body: { message } });
+      await api.post(`/chats/${chatId}/user-message`, { message });
     } catch (err) {
       console.error(err);
     }
@@ -32,15 +32,15 @@ export default function ChatPage() {
 
   const addPrompt = useCallback(async () => {
     try {
-      const stream = await api(`/chats/${chatId}/generate-llm-response`, {
-        method: 'POST',
-        responseType: 'stream'
-      });
+      const { data: stream } = await api.post(
+        `/chats/${chatId}/generate-llm-response`,
+        {},
+        { responseType: 'stream' }
+      );
       const llmMessage: Message = { content: '', role: 'assistant' };
       setMessages(prev => [...prev, llmMessage]);
 
       const decoder = new TextDecoder();
-      // @ts-expect-error Stream does implement the async iterable
       for await (const chunk of stream) {
         const decodedChunk = decoder.decode(chunk);
         llmMessage.content += decodedChunk;
@@ -54,7 +54,7 @@ export default function ChatPage() {
   useEffect(() => {
     const retrieveChatInfo = async () => {
       try {
-        const { chatMessages }: { chatMessages: Message[] } = await api(`/chats/${chatId}`);
+        const { data: { chatMessages } } = await api.get<{ chatMessages: Message[] }>(`/chats/${chatId}`);
         setMessages(chatMessages);
         if (!isNewChatCreated) return;
         await addPrompt();

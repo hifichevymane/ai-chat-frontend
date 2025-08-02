@@ -1,8 +1,12 @@
 import LoginPage from "../pages/Login";
-import { createFileRoute } from "@tanstack/react-router";
-import { redirectToHomeIfAuthenticated } from "../utils/auth";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute('/login')({
   component: LoginPage,
-  beforeLoad: redirectToHomeIfAuthenticated,
+  beforeLoad: ({ context }) => {
+    if (context.auth.isPending) return;
+    if (context.auth.accessToken) {
+      throw redirect({ to: "/" });
+    }
+  },
 });

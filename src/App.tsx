@@ -5,11 +5,13 @@ import { router } from "./router";
 
 function InnerApp() {
   const auth = useAuth();
+  const context = { auth };
+
   if (auth.isPending) {
     return <div>Loading...</div>;
   }
 
-  return <RouterProvider router={router} context={{ auth }} />;
+  return <RouterProvider router={router} context={context} />;
 }
 
 export default function App() {

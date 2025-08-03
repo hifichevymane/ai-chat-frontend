@@ -67,8 +67,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  const value = { accessToken, setAccessToken, isPending };
   return (
-    <AuthContext.Provider value={{ accessToken, setAccessToken, isPending }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

@@ -11,6 +11,7 @@ const signUpValidationSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }).min(1, { message: "Email is required" }).max(255, { message: "Email must be less than 255 characters" }),
   password: z.string().min(8, { message: "Password must be at least 8 characters" }).max(64, { message: "Password must be less than 64 characters" }),
   confirmPassword: z.string().min(8, { message: "Please confirm your password" }),
+  rememberMe: z.boolean().optional()
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
@@ -20,7 +21,7 @@ type SignUpFormValues = z.infer<typeof signUpValidationSchema>;
 
 export default function SignUpPage() {
   const navigate = useNavigate();
-  const { setAccessToken } = useAuth();
+  const { setAccessToken, setShouldLogoutOnBeforeUnload } = useAuth();
 
   const {
     register,
@@ -29,11 +30,14 @@ export default function SignUpPage() {
   } = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpValidationSchema),
     mode: "onChange",
+    defaultValues: {
+      rememberMe: true,
+    },
   });
 
   const onSubmit = async (data: SignUpFormValues) => {
     try {
-      const { firstName, lastName, email, password, confirmPassword } = data;
+      const { firstName, lastName, email, password, confirmPassword, rememberMe } = data;
       const { data: { accessToken } } = await api.post<{ accessToken: string }>("/auth/sign-up", {
         firstName,
         lastName,
@@ -42,6 +46,7 @@ export default function SignUpPage() {
         confirmPassword
       });
       setAccessToken(accessToken);
+      setShouldLogoutOnBeforeUnload(!rememberMe);
       navigate({ to: "/" });
     } catch (error) {
       console.error(error);
@@ -140,6 +145,15 @@ export default function SignUpPage() {
             {errors.confirmPassword && (
               <span id="confirmPassword-error" className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</span>
             )}
+          </label>
+          <label className="inline-flex items-center gap-2 font-secondary text-primary-500 text-sm" htmlFor="rememberMe">
+            <input
+              id="rememberMe"
+              type="checkbox"
+              className="accent-primary-600"
+              {...register("rememberMe")}
+            />
+            Remember me
           </label>
         </div>
         <button

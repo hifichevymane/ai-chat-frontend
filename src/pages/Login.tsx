@@ -14,13 +14,14 @@ const loginValidationSchema = z.object({
   password: z.string()
     .min(8, { message: "Password must be at least 8 characters" })
     .max(64, { message: "Password must be less than 64 characters" }),
+  rememberMe: z.boolean().optional(),
 });
 
 type LoginFormValues = z.infer<typeof loginValidationSchema>;
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { setAccessToken } = useAuth();
+  const { setAccessToken, setShouldLogoutOnBeforeUnload } = useAuth();
 
   const {
     register,
@@ -29,12 +30,18 @@ export default function LoginPage() {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginValidationSchema),
     mode: "onChange",
+    defaultValues: {
+      rememberMe: true,
+    },
   });
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      const { data: { accessToken } } = await api.post<{ accessToken: string }>("/auth/login", data);
+      const { rememberMe, ...otherData } = data;
+      const { data: { accessToken } } = await api.post<{ accessToken: string }>("/auth/login", otherData);
       setAccessToken(accessToken);
+      setShouldLogoutOnBeforeUnload(!rememberMe);
+
       navigate({ to: "/" });
     } catch (error) {
       console.error(error);
@@ -85,6 +92,15 @@ export default function LoginPage() {
             {errors.password && (
               <span id="password-error" className="text-red-500 text-xs mt-1">{errors.password.message}</span>
             )}
+          </label>
+          <label className="inline-flex items-center gap-2 font-secondary text-primary-500 text-sm" htmlFor="rememberMe">
+            <input
+              id="rememberMe"
+              type="checkbox"
+              className="accent-primary-600"
+              {...register("rememberMe")}
+            />
+            Remember me
           </label>
         </div>
         <button

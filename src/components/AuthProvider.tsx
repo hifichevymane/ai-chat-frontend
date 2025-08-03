@@ -21,21 +21,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     fetchAccessToken();
   }, []);
 
-  const handleLogoutOnBeforeUnload = () => api.post('/auth/logout');
-  const handleInvalidateAccessTokenOnBeforeUnload = () => api.post('/auth/invalidate-access-token');
-
   useEffect(() => {
-    if (shouldLogoutOnBeforeUnload) {
-      window.removeEventListener('beforeunload', handleInvalidateAccessTokenOnBeforeUnload);
-      window.addEventListener('beforeunload', handleLogoutOnBeforeUnload);
-    } else if (accessToken) {
-      window.removeEventListener('beforeunload', handleLogoutOnBeforeUnload);
-      window.addEventListener('beforeunload', handleInvalidateAccessTokenOnBeforeUnload);
-    }
+    const handleBeforeUnload = () => {
+      if (shouldLogoutOnBeforeUnload) {
+        api.post('/auth/logout');
+      } else if (accessToken) {
+        api.post('/auth/invalidate-access-token');
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
-      window.removeEventListener('beforeunload', handleInvalidateAccessTokenOnBeforeUnload);
-      window.removeEventListener('beforeunload', handleLogoutOnBeforeUnload);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [shouldLogoutOnBeforeUnload, accessToken]);
 

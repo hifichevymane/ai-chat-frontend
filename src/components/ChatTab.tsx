@@ -6,9 +6,7 @@ interface Props {
 }
 
 export default function ChatTab({ id, title, active, onClick }: Props) {
-  const onBtnClick = () => {
-    onClick(id);
-  };
+  const onBtnClick = () => onClick(id);
 
   return (
     <button onClick={onBtnClick} className={`w-full h-fit flex rounded-full ${active ? 'bg-primary-300' : 'bg-primary-200'} text-primary-500 py-4 pl-8 items-center gap-3.5 text-sm cursor-pointer`}>

@@ -4,13 +4,11 @@ import { AuthContext } from "../auth";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(true);
+  const [isPending, setIsPending] = useState<boolean>(true);
+  const [shouldLogoutOnBeforeUnload, setShouldLogoutOnBeforeUnload] = useState<boolean>(false);
 
   useEffect(() => {
-    const handleBeforeUnload = () => api.post('/auth/invalidate-access-token');
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    const fetchUser = async () => {
+    const fetchAccessToken = async () => {
       try {
         const { data: { accessToken } } = await api.post<{ accessToken: string }>('/auth/refresh');
         setAccessToken(accessToken);
@@ -20,10 +18,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsPending(false);
       }
     };
-    fetchUser();
-
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    fetchAccessToken();
   }, []);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (shouldLogoutOnBeforeUnload) {
+        api.post('/auth/logout');
+      } else if (accessToken) {
+        api.post('/auth/invalidate-access-token');
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [shouldLogoutOnBeforeUnload, accessToken]);
 
   useLayoutEffect(() => {
     const requestInterceptor = api.interceptors.request.use((config) => {
@@ -67,8 +79,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  const value = { accessToken, setAccessToken, isPending, setShouldLogoutOnBeforeUnload };
   return (
-    <AuthContext.Provider value={{ accessToken, setAccessToken, isPending }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

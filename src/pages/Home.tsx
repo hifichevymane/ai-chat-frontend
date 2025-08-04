@@ -5,17 +5,24 @@ import SendBtn from "../components/SendBtn";
 
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { api } from "../fetch";
-import { setIsNewChatCreated } from "../store/chat/chat-slice";
+import { RootState } from "../store";
+import { setIsNewChatCreated, setSelectedPromptCard } from "../store/chat/chat-slice";
 
 export default function HomePage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [inputText, setInputText] = useState<string>('');
+  const selectedPromptCard = useSelector((state: RootState) => state.chat.selectedPromptCard);
 
   const isSendBtnActive = !!inputText.trim();
+
+  if (selectedPromptCard) {
+    setInputText(selectedPromptCard);
+    dispatch(setSelectedPromptCard(''));
+  }
 
   const onInput: React.ChangeEventHandler<HTMLInputElement> = ({ target }) => {
     setInputText(target.value);

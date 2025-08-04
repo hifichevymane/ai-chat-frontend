@@ -1,17 +1,20 @@
 import { RouterProvider } from "@tanstack/react-router";
 import { useAuth } from "./hooks";
-import { AuthProvider } from "./components/AuthProvider";
 import { router } from "./router";
+
+import { AuthProvider } from "./components/AuthProvider";
+import LoadingPlaceholder from "./components/LoadingPlaceholder";
 
 function InnerApp() {
   const auth = useAuth();
   const context = { auth };
 
-  if (auth.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  return <RouterProvider router={router} context={context} />;
+  return (
+    <>
+      <LoadingPlaceholder isLoading={auth.isPending} minDuration={500} />
+      <RouterProvider router={router} context={context} />
+    </>
+  );
 }
 
 export default function App() {

@@ -2,11 +2,16 @@ import type { PropsWithChildren } from "react";
 
 interface Props {
   theme: string;
+  onClick?: (prompt: string) => void;
 }
 
-export default function ThemeCard({ theme, children }: PropsWithChildren<Props>) {
+export default function ThemeCard({ theme, children, onClick }: PropsWithChildren<Props>) {
+  const handleClick = () => {
+    onClick?.(children as string);
+  };
+
   return (
-    <div className="
+    <div onClick={handleClick} className="
       flex flex-col 
       justify-center items-center 
       bg-primary-100 

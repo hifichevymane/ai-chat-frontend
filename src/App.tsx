@@ -9,12 +9,11 @@ function InnerApp() {
   const auth = useAuth();
   const context = { auth };
 
-  return (
-    <>
-      <LoadingPlaceholder isLoading={auth.isPending} minDuration={500} />
-      <RouterProvider router={router} context={context} />
-    </>
-  );
+  if (auth.isPending) {
+    return <LoadingPlaceholder isLoading={auth.isPending} minDuration={500} />;
+  }
+
+  return <RouterProvider router={router} context={context} />;
 }
 
 export default function App() {

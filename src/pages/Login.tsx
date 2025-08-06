@@ -8,13 +8,11 @@ import { useAuth } from "../hooks";
 import { api } from "../fetch";
 
 const loginValidationSchema = z.object({
-  email: z.string()
-    .email({ message: "Invalid email address" })
-    .min(1, { message: "Email is required" })
-    .max(255, { message: "Email must be less than 255 characters" }),
-  password: z.string()
-    .min(8, { message: "Password must be at least 8 characters" })
-    .max(45, { message: "Password must be less than 45 characters" }),
+  email: z.email({ error: "Invalid email address" })
+    .max(255, { error: "Email must be less than 255 characters" }),
+  password: z.string('Password is required')
+    .min(8, { error: "Password must be at least 8 characters" })
+    .max(45, { error: "Password must be less than 45 characters" }),
   rememberMe: z.boolean().optional(),
 });
 

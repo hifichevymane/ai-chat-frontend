@@ -7,11 +7,11 @@ import { api } from "../fetch";
 import { useAuth } from "../hooks";
 
 const signUpValidationSchema = z.object({
-  firstName: z.string().min(1, { message: "First name is required" }).max(64, { message: "First name must be less than 64 characters" }),
-  lastName: z.string().min(1, { message: "Last name is required" }).max(64, { message: "Last name must be less than 64 characters" }),
-  email: z.string().email({ message: "Invalid email address" }).min(1, { message: "Email is required" }).max(255, { message: "Email must be less than 255 characters" }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters" }).max(64, { message: "Password must be less than 64 characters" }),
-  confirmPassword: z.string().min(8, { message: "Please confirm your password" }),
+  firstName: z.string("First name is required").max(64, { error: "First name must be less than 64 characters" }),
+  lastName: z.string("Last name is required").max(64, { error: "Last name must be less than 64 characters" }),
+  email: z.email({ error: "Invalid email address" }).max(255, { error: "Email must be less than 255 characters" }),
+  password: z.string("Password is required").min(8, { error: "Password must be at least 8 characters" }).max(64, { error: "Password must be less than 64 characters" }),
+  confirmPassword: z.string("Please confirm your password").min(8, { error: "Please confirm your password" }),
   rememberMe: z.boolean().optional()
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",

@@ -11,13 +11,15 @@ A modern, minimal frontend for an AI chat application, built with React, TypeScr
 - [TanStack Query](https://tanstack.com/query/latest) - Powerful asynchronous state management for React
 - [Redux Toolkit](https://redux-toolkit.js.org/) - A predictable state container for JavaScript applications
 - [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS framework
-- [ofetch](https://github.com/unjs/ofetch) — Lightweight fetch wrapper
+- [Axios](https://axios-http.com/) — Promise based HTTP client for the browser and node.js
 - [React Hook Form](https://www.react-hook-form.com/) - Performant, flexible and extensible forms with easy-to-use validation.
 - [zod](https://zod.dev/) - TypeScript-first schema validation with static type inference
 - [React Markdown](https://github.com/remarkjs/react-markdown) — Render Markdown in React
 - [remark-gfm](https://github.com/remarkjs/remark-gfm) — GitHub Flavored Markdown support
 - [ESLint](https://eslint.org/) — Linting utility for JavaScript and TypeScript
 - [Prettier](https://prettier.io/) - Formatting utility for JavaScript and TypeScript
+- [Vitest](https://vitest.dev/) - Unit Testing utility
+- [React Testing Library](https://testing-library.com/) - Library to work with React in unit tests
 
 ## 🛠️ Getting Started
 
